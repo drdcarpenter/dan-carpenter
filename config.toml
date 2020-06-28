@@ -80,3 +80,10 @@ url = "mailto:drdcarpenter@googlemail.com"
   weight = 400
   identifier = "about"
   url = "/about/"
+  
+  [[menu.main]]
+  name = "CV"
+  weight = 500
+  identifier = "cv"
+  url = "/cv/"
+  

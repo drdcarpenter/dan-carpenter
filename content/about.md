@@ -1,31 +1,23 @@
 ---
 aliases:
-- about-us
-- about-hugo
+- about-me
+- about-dancarpenter
 - contact
-author: Hugo Authors
-date: "2019-02-28"
-description: Hugo, the world’s fastest framework for building websites
+author: Dan Carpenter
+date: "2020-06-28"
+description: Dan Carpenter, ecologist and environmental data scientist
 title: About
 ---
 
-Written in Go, Hugo is an open source static site generator available under the [Apache Licence 2.0.](https://github.com/gohugoio/hugo/blob/master/LICENSE) Hugo supports TOML, YAML and JSON data file types, Markdown and HTML content files and uses shortcodes to add rich content. Other notable features are taxonomies, multilingual mode, image processing, custom output formats, HTML/CSS/JS minification and support for Sass SCSS workflows.
+Dan Carpenter is an ecologist and environmental data scientist.  I am interested in using environmental data to support evidence-based decision making.  I think good data are the foundations of good decisions and much of my work is about turning good data into evidence to support those decisions.
 
-Hugo makes use of a variety of open source projects including:
+I have a BSc (Hons.) in Wildlife Conservation (University of East London) and a PhD in Soil Science (University of Reading).  I have worked in academic research, local government and the NGO sector.  I am a Chartered Environmentalist (CEnv).  For more on my background, please see my [CV](/cv/).
 
-* https://github.com/yuin/goldmark
-* https://github.com/alecthomas/chroma
-* https://github.com/muesli/smartcrop
-* https://github.com/spf13/cobra
-* https://github.com/spf13/viper
+R is my main tool for environmental data science. I have so far written one package and I am working on a couple of others.  I also use QGIS for a lot of my work.  I am very much a beginner and this website will document both my successes and my failures in creating work that is, I hope, of value to others.  This website will showcase some of the [projects](/projects/) I am working on, as well as being a platform for articles about my work, both professional and otherwise.
 
-Hugo is ideal for blogs, corporate websites, creative portfolios, online magazines, single page applications or even a website with thousands of pages.
+I currently work at the [Thames Valley Environmental Records Centre](http://www.tverc.org) where I put into practice the business of using data for decision making.
 
-Hugo is for people who want to hand code their own website without worrying about setting up complicated runtimes, dependencies and databases.
-
-Websites built with Hugo are extremelly fast, secure and can be deployed anywhere including, AWS, GitHub Pages, Heroku, Netlify and any other hosting provider.
-
-Learn more and contribute on [GitHub](https://github.com/gohugoio).
+I drink a LOT of tea.  I love cricket.
 
 
 
