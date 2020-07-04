@@ -23,13 +23,22 @@ DisableComments: no
 <p>Green spaces in the UK are under pressure. Many local authorities lack the funding necessary to maintain them, let alone enhance them. There is pressure to deliver new housing, schools and other buildings and green spaces are often locations for these developments. But as the UK lockdown resulting from the coronavirus pandemic has shown, green spaces are really important for our health and well-being. Our local park has been a lifeline to us for exercise and many others have found comfort and solace in nature.</p>
 <p>So green spaces are really important as places to relax, exercise and escape the stress of daily life. And to be tranquil they need to be green, calm and full of natural sound. Hearing the birds singing, the wind in the trees, or the sound of moving water is calming. If green spaces are well away from human sound, they can be oases of calm. However, too much human sound (traffic, aircraft, other human noises) reduces the tranquility of a space and it is less calming. Nonetheless, a green spaces in an urban area can still be relatively tranquil compared to a busy street.</p>
 <p>It is therefore really important to protect these spaces and ensure they remain tranquil so that people can benefit from spending time in them. To do this though, we need to know how tranquil a space is and what the risks are to that tranquility, particularly from new projects, such as housing developments or new roads.</p>
+<p>I have been involved in a project with the George Institute at the University of Oxford which is deploying <a href="https://www.openacousticdevices.info/">AudioMoth</a> units in greenspaces in Oxfordshire. The aim is to understand the naturalness of these greenspaces. The plan is to use automatic classification of sound from the recordings to measure the soundscapes against some indices. More information on the project can be found on <a href="https://www.greenspacehack.com/project/nature_sensing.html">the website</a>.</p>
+<p>I am interested in whether automated audio recording and the Natural Tranquility Method are compatible.</p>
 </div>
 <div id="measuring-tranquility---introducing-the-ntm" class="section level2">
 <h2>Measuring tranquility - introducing the NTM</h2>
 <p>The Natural Tranquility Method (Bentley 2019) is a way to measure tranquility based on the quantity and quality of sound. Clive Bentley, the originator of the NTM, has published a book describing this method, called Tranquil Spaces. You can read more about it on the <a href="https://naturaltranquillity.com/">Natural Tranquility website</a>.</p>
+<p>That Natural Tranquility Method uses four parameters to define tranquility. These are:
+* NAMM - a rating from 1 - 5 of how much natural or man-made sound there is in a space
+* PONS - the percentage of natural sound
+* Lrr - the noise contribution of road and rail (in decibels)
+* Lat - the total overall level of sound (in decibels)</p>
+<p>Feeding these values into an algorithm calculates the probability of recording each tranquility score. The maximum probability is selected as the tranquility score for that location. Much more detail is available in the book!</p>
 </div>
 <div id="the-ntm-package" class="section level2">
 <h2>The ntm package</h2>
+<p>The Sharps Redmore website provides an online calculator for tranquility scores or levels. I wanted to write an R package to calculate these scores instead. I do a lot of work in R - it is my preferred way of interactive with and analysing data. For me an R package to calculate tranquility scores make sense. So I wrote one! It is my first package - it is very simple and niche, but it was a very useful learning exercise.</p>
 </div>
 <div id="next-steps" class="section level2">
 <h2>Next steps</h2>
