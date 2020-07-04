@@ -30,6 +30,7 @@ I am interested in whether automated audio recording and the Natural Tranquility
 The Natural Tranquility Method (Bentley 2019) is a way to measure tranquility based on the quantity and quality of sound.  Clive Bentley, the originator of the NTM, has published a book describing this method, called Tranquil Spaces.  You can read more about it on the [Natural Tranquility website](https://naturaltranquillity.com/).
 
 That Natural Tranquility Method uses four parameters to define tranquility.  These are:
+
 * NAMM - a rating from 1 - 5 of how much natural or man-made sound there is in a space
 * PONS - the percentage of natural sound
 * Lrr - the noise contribution of road and rail (in decibels)
@@ -40,7 +41,14 @@ Feeding these values into an algorithm calculates the probability of recording e
 ## The ntm package
 The Sharps Redmore website provides an online calculator for tranquility scores or levels.  I wanted to write an R package to calculate these scores instead.  I do a lot of work in R - it is my preferred way of interactive with and analysing data.  For me an R package to calculate tranquility scores make sense.  So I wrote one!  It is my first package - it is very simple and niche, but it was a very useful learning exercise.
 
-## Next steps
+The ntm package calculates a tranquility score for either a single location when provided with NAMM, PONS, Lrr and Lat values, or tranquility scores for a dataframe of these values.  You can find out more about the package on [its website](https://drdcarpenter.github.io/ntm/).
 
+## Next steps
+Writing an R package for the Natural Tranquility Method was a satisfying achievement.  But there is more I want to do.
+
+I have been reading about the plumber R package and I would like to replicate the Natural Tranquility calculator using an api written in R.  This is a work in progress.  I need to work out what gets returned from the ntm_score() function in the ntm package (I think this is a string surrounded by html tags) and also how to send data from an html form to the api.
 
 ## Longer term ambitions
+I also want to explore AudioMoth data and acoustic indices to see if it is possible to get at similar qualities of a soundscape as those required for the NTM.  This would mean it was quicker to collect multiple measurements of tranquility across a longer time period that can be achieved in a single site visit.  I am hoping data from the nature sensing project can be used for this.
+
+If this proves to be possible, I would like to carry out a survey using volunteer deployment of AudioMoth recorders across a landscape (e.g. county) to measure tranquility over a wide area.  I think this will be really important for identifying places that are tranquil and protecting them from increases in man-made sound.
