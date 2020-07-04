@@ -5,7 +5,7 @@ aliases:
 - projects
 author: Dan Carpenter
 date: "2020-06-28"
-description: Dan Carpenter, ecologist and environmental data scientist
+description: Details about my projects
 title: Projects
 ---
 
