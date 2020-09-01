@@ -1,0 +1,89 @@
+---
+title: Lichens in Sabah - geology and soils data
+author: Dan Carpenter
+date: '2020-08-28'
+slug: sabah-geology-data
+categories:
+  - sabah
+  - R
+  - maps
+tags:
+  - R
+Description: 'Exploring the geology and soils in Sabah, Malaysia, as part of work on a paper on lichens from my post-doc field work in 2012'
+Tags: []
+Categories: []
+DisableComments: no
+---
+
+# Introduction
+Back in 2012, shortly after the London Olympic Games, I led a small team of scientists from the Natural History Museum, London, on a field trip to Sabah, Malaysia.  We were part of a much larger trip featuring several scientists all collecting samples from terrestrial, freshwater and marine habitats across Sabah.  My team had two key interests: invertebrates and lichens.  I was leading work to sample invertebrates from across habitat strata using a variety of techniques.  This included soil pits, leaf litter, dead wood, Malaise traps, SLAMM traps hung in trees and flight intercept traps.  The idea was to look at how different the invertebrates were in each of these strata, as well as if there was an effect of distance and disturbance on the invertebrates.  There were two other scientists in my team whose focus was lichens.
+
+We visited three different locations to carry out our field work: Danum Valley Conservation area, the SAFE project and Maliau Basin Conservation area.  The SAFE project is looking at the effect of logging and palm oil plantations on biodiversity and so was a very different landscape to the two nature reserve areas.  Danum Valley has a long established field centre and each year (usually) dozens of UK students visit it to learn about lowland tropical rainforests.  AS do many researchers from across the world.  Maliau Basin centre is more recent and fewer people seem to visit it, although the facilities there are excellent.
+
+# Lichens
+The other two members of the team, Holger and Pat, were there to look at lichens.  These are fascinating organisms crudely speaking a fungus hosting an alga.  Better descriptions of the fascinating biology are available elsewhere.  They were mainly looking at lichens on trees, but I am sure a few from rocks and other substrates sneaked into the collections.
+
+A few weeks ago I received an email from Pat asking me if I was able to help them out with a paper about the lichens from the Sabah trip.  They wanted some help with data and mapping from the field sites.  As designed the experimental set up, they were also keen for me to explain the rationale behind the location of the individual sampling locations.  I was only too pleased to help and to revisit that trip.
+
+# Geology and soils data
+Since then I have been working on a description of the sites, their geology, soils, climate and vegetation structure, as well as a description of the experimental design.  It has been fun exploring again the field sites we visited and learning a bit more about them.
+
+I have been fascinated by geology and soils since my undergraduate degree - indeed most of my scientific research has been focussed on soil ecology.  However, I did not know much about the geology or soils of Sabah.  So I needed to find some data to help with the description of my field sites.  What I thought I would do in this post was a quick demo of getting Web Map Services (WMS) data into a webmap in R as a way of talking about the geology and soils of Sabah.
+
+## Sampling sites
+I have the locations of my sampling sites as x,y coordinates in a csv file.  So what I will do is create a Leaflet map and plot these sites on it.
+
+[Leaflet](https://leafletjs.com/) is an open source javascript library for which there is an R package.  Leaflet is great and the javascript library can do so much more than has been currently translated into R.  However, what has been is more than enough and there is still work ongoing to translate more.  The great thing is Leaflet can easily be incorporated into RMarkdown docs and Shiny apps, as well as creating standalone webmaps.
+
+First things first, load our libraries and read in the csv file with the sampling sites:
+```{r libraries, message=FALSE, warning=FALSE}
+library(readr)
+library(leaflet)
+
+sampling <- read_csv("sabah_sites.csv")
+
+```
+
+Now we have our data in we need to create a leaflet map and add the points:
+```{r leaflet map, message=FALSE, warning=FALSE}
+
+m <- leaflet() %>% 
+  addTiles(group = "OpenStreetMap") %>% 
+  addMarkers(data = sampling, lng = sampling$Longitude_E, lat = sampling$Latitude_N, group = "Markers")
+m
+
+```
+
+This creates a Leaflet webmap with OpenStreetMap background mapping ('addTiles()'), and adds markers for each of the sampling sites. If you zoom out a bit, you can see the whole of Sabah and its coastline.  Now we need to add some geology data. 
+
+## Geology data
+I found a WMS for Sabah geology, but to be quite honest I cannot track down where I found it.  I have the WMS URL and have read it into QGIS, but where I found it in the first place is a bit of a mystery.  This is not good practice on my part - I should have saved a link or kept a note of where I found it.  What I can do is add it to my Leaflet map though:
+```{r add WMS, message=FALSE, warning=FALSE}
+
+m <- m %>% addWMSTiles("http://onegeology-asia.org/ows/GSJ_JMG_Combined_Bedrock_and_Superficial_Geology_and_Age/wms?", 
+                  layers = "MYS_EASTERN_JMG_1M_Combined_BLT_SLT_BA",
+                  attribution = "Minerals and Geoscience Department of Malaysia (JMG)",
+                  group = "geology") %>% 
+  addLayersControl(baseGroups = c("OpenStreetMap"),
+                   overlayGroups = c("Markers", "geology", "soil"))
+
+m
+
+```
+
+There you have it, geology data added to the webmap.  I added a layer control so that you could turn the geology on and off.
+
+I could not find a convenient WMS service or other polygon data for soils in Sabah, but I did find an archive of soils maps compiled by the [European Commission](https://esdac.jrc.ec.europa.eu/resource-type/national-soil-maps-eudasm?type=All&field_data_continent_tid_selective=1267&field_data_country_country_selective=MY&field_data_cont_coverage_value=&page=1).  I downloaded some soils maps for Sabah from this site.  They were jpegs and required georeferencing - as I was working in QGIS for the project, I used the [QGIS georeferencer](https://docs.qgis.org/3.10/en/docs/user_manual/working_with_raster/georeferencer.html) to do this.  The result was good enough for me to work out the soil types for the field sites.
+
+You can add rasters to Leaflet webmaps using addRasterImage(), but the soil map raster is so large that it will not render!  So I can't show you that.
+
+# Summary
+I have enjoyed revisiting my work in Sabah and getting to know the country better via its geology and soils.  It is also useful to remind myself how to add WMS services to a leaflet map in R.  I will write a further post when the paper has been published.
+
+```{r session info, message=FALSE, warning=FALSE}
+sessionInfo()
+```
+
+
+
+

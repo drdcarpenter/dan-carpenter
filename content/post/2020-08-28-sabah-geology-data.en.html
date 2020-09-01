@@ -1,0 +1,113 @@
+---
+title: Lichens in Sabah - geology and soils data
+author: Dan Carpenter
+date: '2020-08-28'
+slug: sabah-geology-data
+categories:
+  - sabah
+  - R
+  - maps
+tags:
+  - R
+Description: 'Exploring the geology and soils in Sabah, Malaysia, as part of work on a paper on lichens from my post-doc field work in 2012'
+Tags: []
+Categories: []
+DisableComments: no
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/leaflet/leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet/leaflet.js"></script>
+<link href="/rmarkdown-libs/leafletfix/leafletfix.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/Proj4Leaflet/proj4-compressed.js"></script>
+<script src="/rmarkdown-libs/Proj4Leaflet/proj4leaflet.js"></script>
+<link href="/rmarkdown-libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet-binding/leaflet.js"></script>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Back in 2012, shortly after the London Olympic Games, I led a small team of scientists from the Natural History Museum, London, on a field trip to Sabah, Malaysia. We were part of a much larger trip featuring several scientists all collecting samples from terrestrial, freshwater and marine habitats across Sabah. My team had two key interests: invertebrates and lichens. I was leading work to sample invertebrates from across habitat strata using a variety of techniques. This included soil pits, leaf litter, dead wood, Malaise traps, SLAMM traps hung in trees and flight intercept traps. The idea was to look at how different the invertebrates were in each of these strata, as well as if there was an effect of distance and disturbance on the invertebrates. There were two other scientists in my team whose focus was lichens.</p>
+<p>We visited three different locations to carry out our field work: Danum Valley Conservation area, the SAFE project and Maliau Basin Conservation area. The SAFE project is looking at the effect of logging and palm oil plantations on biodiversity and so was a very different landscape to the two nature reserve areas. Danum Valley has a long established field centre and each year (usually) dozens of UK students visit it to learn about lowland tropical rainforests. AS do many researchers from across the world. Maliau Basin centre is more recent and fewer people seem to visit it, although the facilities there are excellent.</p>
+</div>
+<div id="lichens" class="section level1">
+<h1>Lichens</h1>
+<p>The other two members of the team, Holger and Pat, were there to look at lichens. These are fascinating organisms crudely speaking a fungus hosting an alga. Better descriptions of the fascinating biology are available elsewhere. They were mainly looking at lichens on trees, but I am sure a few from rocks and other substrates sneaked into the collections.</p>
+<p>A few weeks ago I received an email from Pat asking me if I was able to help them out with a paper about the lichens from the Sabah trip. They wanted some help with data and mapping from the field sites. As designed the experimental set up, they were also keen for me to explain the rationale behind the location of the individual sampling locations. I was only too pleased to help and to revisit that trip.</p>
+</div>
+<div id="geology-and-soils-data" class="section level1">
+<h1>Geology and soils data</h1>
+<p>Since then I have been working on a description of the sites, their geology, soils, climate and vegetation structure, as well as a description of the experimental design. It has been fun exploring again the field sites we visited and learning a bit more about them.</p>
+<p>I have been fascinated by geology and soils since my undergraduate degree - indeed most of my scientific research has been focussed on soil ecology. However, I did not know much about the geology or soils of Sabah. So I needed to find some data to help with the description of my field sites. What I thought I would do in this post was a quick demo of getting Web Map Services (WMS) data into a webmap in R as a way of talking about the geology and soils of Sabah.</p>
+<div id="sampling-sites" class="section level2">
+<h2>Sampling sites</h2>
+<p>I have the locations of my sampling sites as x,y coordinates in a csv file. So what I will do is create a Leaflet map and plot these sites on it.</p>
+<p><a href="https://leafletjs.com/">Leaflet</a> is an open source javascript library for which there is an R package. Leaflet is great and the javascript library can do so much more than has been currently translated into R. However, what has been is more than enough and there is still work ongoing to translate more. The great thing is Leaflet can easily be incorporated into RMarkdown docs and Shiny apps, as well as creating standalone webmaps.</p>
+<p>First things first, load our libraries and read in the csv file with the sampling sites:</p>
+<pre class="r"><code>library(readr)
+library(leaflet)
+
+sampling &lt;- read_csv(&quot;sabah_sites.csv&quot;)</code></pre>
+<p>Now we have our data in we need to create a leaflet map and add the points:</p>
+<pre class="r"><code>m &lt;- leaflet() %&gt;% 
+  addTiles(group = &quot;OpenStreetMap&quot;) %&gt;% 
+  addMarkers(data = sampling, lng = sampling$Longitude_E, lat = sampling$Latitude_N, group = &quot;Markers&quot;)
+m</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OpenStreetMap",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[[4.744622,4.744572,4.745479,4.747574,4.745651,4.745014,4.750536,4.748643,4.746075,4.964857,4.966025,4.970218,4.966247,4.965117,4.970073,4.971945,4.692231,4.706183,4.698722,4.709935,4.727575,4.704299],[116.970749,116.971082,116.974775,116.967523,116.971396,116.978072,116.966948,116.973083,116.970094,117.793207,117.788686,117.797548,117.798075,117.798137,117.792833,117.801676,117.578486,117.583872,117.534592,117.622742,117.614465,117.647162],null,null,"Markers",{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[4.692231,4.971945],"lng":[116.966948,117.801676]}},"evals":[],"jsHooks":[]}</script>
+<p>This creates a Leaflet webmap with OpenStreetMap background mapping (‘addTiles()’), and adds markers for each of the sampling sites. If you zoom out a bit, you can see the whole of Sabah and its coastline. Now we need to add some geology data.</p>
+</div>
+<div id="geology-data" class="section level2">
+<h2>Geology data</h2>
+<p>I found a WMS for Sabah geology, but to be quite honest I cannot track down where I found it. I have the WMS URL and have read it into QGIS, but where I found it in the first place is a bit of a mystery. This is not good practice on my part - I should have saved a link or kept a note of where I found it. What I can do is add it to my Leaflet map though:</p>
+<pre class="r"><code>m &lt;- m %&gt;% addWMSTiles(&quot;http://onegeology-asia.org/ows/GSJ_JMG_Combined_Bedrock_and_Superficial_Geology_and_Age/wms?&quot;, 
+                  layers = &quot;MYS_EASTERN_JMG_1M_Combined_BLT_SLT_BA&quot;,
+                  attribution = &quot;Minerals and Geoscience Department of Malaysia (JMG)&quot;,
+                  group = &quot;geology&quot;) %&gt;% 
+  addLayersControl(baseGroups = c(&quot;OpenStreetMap&quot;),
+                   overlayGroups = c(&quot;Markers&quot;, &quot;geology&quot;, &quot;soil&quot;))
+
+m</code></pre>
+<div id="htmlwidget-2" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OpenStreetMap",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[[4.744622,4.744572,4.745479,4.747574,4.745651,4.745014,4.750536,4.748643,4.746075,4.964857,4.966025,4.970218,4.966247,4.965117,4.970073,4.971945,4.692231,4.706183,4.698722,4.709935,4.727575,4.704299],[116.970749,116.971082,116.974775,116.967523,116.971396,116.978072,116.966948,116.973083,116.970094,117.793207,117.788686,117.797548,117.798075,117.798137,117.792833,117.801676,117.578486,117.583872,117.534592,117.622742,117.614465,117.647162],null,null,"Markers",{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addWMSTiles","args":["http://onegeology-asia.org/ows/GSJ_JMG_Combined_Bedrock_and_Superficial_Geology_and_Age/wms?",null,"geology",{"styles":"","format":"image/jpeg","transparent":false,"version":"1.1.1","attribution":"Minerals and Geoscience Department of Malaysia (JMG)","layers":"MYS_EASTERN_JMG_1M_Combined_BLT_SLT_BA"}]},{"method":"addLayersControl","args":["OpenStreetMap",["Markers","geology","soil"],{"collapsed":true,"autoZIndex":true,"position":"topright"}]}],"limits":{"lat":[4.692231,4.971945],"lng":[116.966948,117.801676]}},"evals":[],"jsHooks":[]}</script>
+<p>There you have it, geology data added to the webmap. I added a layer control so that you could turn the geology on and off.</p>
+<p>I could not find a convenient WMS service or other polygon data for soils in Sabah, but I did find an archive of soils maps compiled by the <a href="https://esdac.jrc.ec.europa.eu/resource-type/national-soil-maps-eudasm?type=All&amp;field_data_continent_tid_selective=1267&amp;field_data_country_country_selective=MY&amp;field_data_cont_coverage_value=&amp;page=1">European Commission</a>. I downloaded some soils maps for Sabah from this site. They were jpegs and required georeferencing - as I was working in QGIS for the project, I used the <a href="https://docs.qgis.org/3.10/en/docs/user_manual/working_with_raster/georeferencer.html">QGIS georeferencer</a> to do this. The result was good enough for me to work out the soil types for the field sites.</p>
+<p>You can add rasters to Leaflet webmaps using addRasterImage(), but the soil map raster is so large that it will not render! So I can’t show you that.</p>
+</div>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>I have enjoyed revisiting my work in Sabah and getting to know the country better via its geology and soils. It is also useful to remind myself how to add WMS services to a leaflet map in R. I will write a further post when the paper has been published.</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 3.6.3 (2020-02-29)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 20.04 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    
+##  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   
+##  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] leaflet_2.0.3 readr_1.3.1  
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.4.6      knitr_1.28        magrittr_1.5      hms_0.5.3        
+##  [5] R6_2.4.1          rlang_0.4.6       stringr_1.4.0     tools_3.6.3      
+##  [9] xfun_0.15         htmltools_0.5.0   crosstalk_1.1.0.1 ellipsis_0.3.1   
+## [13] yaml_2.2.1        digest_0.6.25     tibble_3.0.1      lifecycle_0.2.0  
+## [17] crayon_1.3.4      bookdown_0.20     htmlwidgets_1.5.1 vctrs_0.3.1      
+## [21] evaluate_0.14     rmarkdown_2.3     blogdown_0.20     stringi_1.4.6    
+## [25] compiler_3.6.3    pillar_1.4.4      jsonlite_1.6.1    pkgconfig_2.0.3</code></pre>
+</div>
