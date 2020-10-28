@@ -15,7 +15,7 @@ I have a BSc (Hons.) in Wildlife Conservation (University of East London) and a 
 
 R is my main tool for environmental data science. I have so far written one package and I am working on a couple of others.  I also use QGIS for a lot of my work.  I am very much a beginner and this website will document both my successes and my failures in creating work that is, I hope, of value to others.  This website will showcase some of the [projects](/projects/) I am working on, as well as being a platform for articles about my work, both professional and otherwise.
 
-I currently work at the [Thames Valley Environmental Records Centre](http://www.tverc.org) where I put into practice the business of using data for decision making.
+I currently work for [Ethos Environmental Planning Ltd](www.ethosep.co.uk) where I put into practice the business of using data for decision making.
 
 I drink a LOT of tea.  I love cricket.
 
