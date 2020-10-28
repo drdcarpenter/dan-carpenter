@@ -1,0 +1,99 @@
+---
+title: Estimating carbon in priority habitats
+author: Dan Carpenter
+date: '2020-10-28'
+slug: carbon-in-habitats
+categories:
+  - R
+  - carbon
+  - habitats
+tags:
+  - R
+Description: 'Estimating the carbon carbon stored in priority habitats'
+Tags: []
+Categories: []
+DisableComments: no
+---
+
+## Introduction
+A few weeks a go a wrote a short article for the [Thames Valley Environmental Records Centre (TVERC)](http://www.tverc.org/cms/news/value-priority-habitats-carbon-storage-and-sequestration) on the amount of carbon stored and sequestered by priority habitats in Berkshire and Oxfordshire.  The climate emergency has prompted many people, businesses, organisations and governments to think about to address increasing carbon emissions.  The lead up to the UK election in December 2019 saw parties of all colours promising to plant trees to absorb some of the UK's carbon emissions.  The [Friends of the Earth UK](https://friendsoftheearth.uk/trees) want to double UK tree cover to help in the fight against climate change; others have similar plans for campaigns.  Trees are an important part in addressing climate change and carbon emissions.  But, we need to ensure we get the right trees, in the right place, for the right reasons.  Once again, [TVERC](http://www.tverc.org/cms/news/tverc-project-update-oxfordshire-trees) are involved in work to work out where trees could go.
+
+We are also in the midst of an ecological crisis.  Biodiversity has declined at an unprecedented rate and the time to act is now.  The actions we need to take are clear and strategy is emerging to [halt and reverse biodiversity loss](https://www.unep-wcmc.org/news/strategy-for-halting-and-reversing-biodiversity-loss-revealed).  However one of the worst things we could do is to not link natural climate solutions (i.e. tree planting) with actions to halt and reverse biodiversity decline.  And this means not planting tees on habitats that have a high value for biodiversity.
+
+UK priority habitats are the most important for nature conservation as they support important communities that are rare in the wider countryside.  The aim of my article was to show that these habitats also have a role to play in carbon storage and sequestration.
+
+In this post I will demonstrate how you can calculate the carbon storage and sequestration of priority habitats using a small R package I created called carbonhabitats.
+
+## Get some data
+For the TVERC post I used TVERC data - but for this post I will use the Natural England Priority Habitat Inventory (NE PHI).  These data are getting quite out of date now and in some areas they miss a lot of priority habitats.  However, if you are looking at regional or national patterns then they are adequate.  I downloaded the southern England data from the [Natural England website](https://data.gov.uk/dataset/4b6ddab7-6c0f-4407-946e-d6499f19fcde/priority-habitat-inventory-england) and then selected only those features that intersected with South Somerset District boundary. (I did this in QGIS because I had some trouble downloading the admin boundaries and I want to take a look at things.)
+
+I created a small R package to calculate the carbon storage and sequestration for habitats based on the data in a paper by [Field et al. (2020)](https://doi.org/10.1016/j.biocon.2020.108619) which you can find on [GitHub](https://github.com/drdcarpenter/carbonhabitats).  In preparing this post I realised one of the key issues with data - people called the same things by different names!  I updated it so that it worked with the NE PHI data.  One of my current soapbox rants is the need for standards in natural environment data.
+
+Anyway, we now have some data so lets look at calculating carbon storage and sequestration.
+
+## Calcuating carbon storage and sequestration
+The first thing to do is install the package from Github.  I like using the remotes package for this.  We also need the sf package for reading in the habitats data.  I also like to use the glimpse function from dplyr to look at my data:
+```{r setup, message=FALSE, warning=FALSE}
+# remotes::install_github("drdcarpenter/carbonhabitats")
+library(carbonhabitats)
+library(sf)
+library(dplyr)
+library(janitor)
+```
+
+Next we need read in our habitats data.  I have mine saved as an ESRI Shapefile:
+```{r read in data, warning=FALSE}
+habs <- st_read("habitats.shp")
+```
+
+So now we have our habitats data read in.  For the carbonhabitats package, we need to supply the name of the column in which the priority habitat typess can be found.  So lets have a quick squint at the data:
+```{r find the habitats, warning=FALSE}
+glimpse(habs)
+```
+
+The column "Main_Habit" has the habitat types in it.  So now we can use the carbonhabitats package to calculate the carbon storage and sequestration values for these habitats.  The function carbonise in the package does this:
+```{r carbonise, warning=FALSE, message=FALSE, results='hide'}
+habs <- carbonise(habs, habitats = "Main_Habit")
+```
+
+The carbonise function adds columns to your dataframe that include the above ground (ABG) stored, soil and total stored carbon, plus the amount of carbon sequestered each year.  Using some standard dplyr code we can produce a summary table of the amount of asbove ground carbon stored by each habitat:
+```{r summary table, warning=FALSE, message=FALSE}
+
+storedc <- habs %>% 
+  as.data.frame() %>% 
+  select(Main_Habit, storedC) %>% 
+  group_by(Main_Habit) %>% 
+  summarise(total_stored_C = round(sum(storedC), 0)) %>% 
+  adorn_totals()
+
+knitr::kable(storedc)
+
+```
+
+And similarly the amount of carbon sequestered by each habitat annually:
+```{r sequestered C, warning=FALSE, message=FALSE}
+
+sequesteredc <- habs %>% 
+  as.data.frame() %>% 
+  select(Main_Habit, seqC) %>% 
+  group_by(Main_Habit) %>% 
+  summarise(total_seq_c = round(sum(seqC), 0)) %>% 
+  adorn_totals()
+
+knitr::kable(sequesteredc)
+
+```
+
+Incidentally, `adorn_totals()` is a useful function from the janitor package.
+
+So there we have it.  A method for calculating the stored carbon and sequestered carbon for priority habitats in the UK.  
+
+## Next steps
+There are a few things to do.  I need to make sure the code is robust to other versions of the names for priority habitats.  Or persuade people to adopt a standard!  The other thing that was pointed out by an early user was that I have added soil carbon to ponds, and I need to re-read the papers to work out how to deal with this.  In the first instance I can remove soil carbon from ponds - that seems sensible.  But I need to go back to the Taylor et al. (2019) paper to see exactly what is included in their estimates for carbon storage and burial.  I also need to work on adding other priority habitats that are currently missing from the package.
+
+```{r end}
+
+sessionInfo()
+
+```
+

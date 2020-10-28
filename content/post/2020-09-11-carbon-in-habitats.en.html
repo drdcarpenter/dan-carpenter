@@ -1,0 +1,272 @@
+---
+title: Estimating carbon in priority habitats
+author: Dan Carpenter
+date: '2020-10-28'
+slug: carbon-in-habitats
+categories:
+  - R
+  - carbon
+  - habitats
+tags:
+  - R
+Description: 'Estimating the carbon carbon stored in priority habitats'
+Tags: []
+Categories: []
+DisableComments: no
+---
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>A few weeks a go a wrote a short article for the <a href="http://www.tverc.org/cms/news/value-priority-habitats-carbon-storage-and-sequestration">Thames Valley Environmental Records Centre (TVERC)</a> on the amount of carbon stored and sequestered by priority habitats in Berkshire and Oxfordshire. The climate emergency has prompted many people, businesses, organisations and governments to think about to address increasing carbon emissions. The lead up to the UK election in December 2019 saw parties of all colours promising to plant trees to absorb some of the UK’s carbon emissions. The <a href="https://friendsoftheearth.uk/trees">Friends of the Earth UK</a> want to double UK tree cover to help in the fight against climate change; others have similar plans for campaigns. Trees are an important part in addressing climate change and carbon emissions. But, we need to ensure we get the right trees, in the right place, for the right reasons. Once again, <a href="http://www.tverc.org/cms/news/tverc-project-update-oxfordshire-trees">TVERC</a> are involved in work to work out where trees could go.</p>
+<p>We are also in the midst of an ecological crisis. Biodiversity has declined at an unprecedented rate and the time to act is now. The actions we need to take are clear and strategy is emerging to <a href="https://www.unep-wcmc.org/news/strategy-for-halting-and-reversing-biodiversity-loss-revealed">halt and reverse biodiversity loss</a>. However one of the worst things we could do is to not link natural climate solutions (i.e. tree planting) with actions to halt and reverse biodiversity decline. And this means not planting tees on habitats that have a high value for biodiversity.</p>
+<p>UK priority habitats are the most important for nature conservation as they support important communities that are rare in the wider countryside. The aim of my article was to show that these habitats also have a role to play in carbon storage and sequestration.</p>
+<p>In this post I will demonstrate how you can calculate the carbon storage and sequestration of priority habitats using a small R package I created called carbonhabitats.</p>
+</div>
+<div id="get-some-data" class="section level2">
+<h2>Get some data</h2>
+<p>For the TVERC post I used TVERC data - but for this post I will use the Natural England Priority Habitat Inventory (NE PHI). These data are getting quite out of date now and in some areas they miss a lot of priority habitats. However, if you are looking at regional or national patterns then they are adequate. I downloaded the southern England data from the <a href="https://data.gov.uk/dataset/4b6ddab7-6c0f-4407-946e-d6499f19fcde/priority-habitat-inventory-england">Natural England website</a> and then selected only those features that intersected with South Somerset District boundary. (I did this in QGIS because I had some trouble downloading the admin boundaries and I want to take a look at things.)</p>
+<p>I created a small R package to calculate the carbon storage and sequestration for habitats based on the data in a paper by <a href="https://doi.org/10.1016/j.biocon.2020.108619">Field et al. (2020)</a> which you can find on <a href="https://github.com/drdcarpenter/carbonhabitats">GitHub</a>. In preparing this post I realised one of the key issues with data - people called the same things by different names! I updated it so that it worked with the NE PHI data. One of my current soapbox rants is the need for standards in natural environment data.</p>
+<p>Anyway, we now have some data so lets look at calculating carbon storage and sequestration.</p>
+</div>
+<div id="calcuating-carbon-storage-and-sequestration" class="section level2">
+<h2>Calcuating carbon storage and sequestration</h2>
+<p>The first thing to do is install the package from Github. I like using the remotes package for this. We also need the sf package for reading in the habitats data. I also like to use the glimpse function from dplyr to look at my data:</p>
+<pre class="r"><code># remotes::install_github(&quot;drdcarpenter/carbonhabitats&quot;)
+library(carbonhabitats)
+library(sf)
+library(dplyr)
+library(janitor)</code></pre>
+<p>Next we need read in our habitats data. I have mine saved as an ESRI Shapefile:</p>
+<pre class="r"><code>habs &lt;- st_read(&quot;habitats.shp&quot;)</code></pre>
+<pre><code>## Reading layer `habitats&#39; from data source `/home/danc/Documents/dan-carpenter/content/post/habitats.shp&#39; using driver `ESRI Shapefile&#39;
+## Simple feature collection with 10413 features and 27 fields
+## geometry type:  POLYGON
+## dimension:      XY
+## bbox:           xmin: 323194.4 ymin: 104132 xmax: 377398.3 ymax: 138951.4
+## projected CRS:  OSGB 1936 / British National Grid</code></pre>
+<p>So now we have our habitats data read in. For the carbonhabitats package, we need to supply the name of the column in which the priority habitat typess can be found. So lets have a quick squint at the data:</p>
+<pre class="r"><code>glimpse(habs)</code></pre>
+<pre><code>## Rows: 10,413
+## Columns: 28
+## $ Main_Habit &lt;fct&gt; Coastal and floodplain grazing marsh, Coastal and floodpla…
+## $ Confidence &lt;fct&gt; Low, Low, Low, Low, Low, Low, Low, Low, Low, Low, Low, Low…
+## $ Source1    &lt;fct&gt; Higher Level Stewardship, Higher Level Stewardship, Higher…
+## $ S1Date     &lt;date&gt; 2006-08-01, 2006-08-01, 2006-08-01, 2008-02-01, 2008-02-0…
+## $ S1Habclass &lt;fct&gt; FEP/HLS features and options, FEP/HLS features and options…
+## $ S1HabType  &lt;fct&gt; G15: Coastal &amp; Floodplain grazing marsh; HK6, G15: Coastal…
+## $ Source2    &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ S2Date     &lt;date&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ S2Habclass &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ S2HabType  &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ Source3    &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ S3Date     &lt;date&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+## $ S3Habclass &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ S3HabType  &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ Basemappng &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ Annex_1    &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ Add_habits &lt;fct&gt; NA, NA, HLS options: HK7, NA, NA, NA, NA, NA, NA, NA, NA, …
+## $ Candidates &lt;fct&gt; Main habitat: CFPGM (FEP + HLS); LMEAD (FEP + HLS), Main h…
+## $ Rule_Decis &lt;fct&gt; Tests failed: 1.MasterMap description (LMEAD), NA, Tests f…
+## $ GenComment &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ LastModDat &lt;date&gt; 2018-08-25, 2018-08-25, 2018-08-25, 2018-08-25, 2018-08-2…
+## $ ModReason  &lt;fct&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
+## $ Mod_by     &lt;fct&gt; v2.2, v2.2, v2.2, v2.2, v2.2, v2.2, v2.2, v2.2, v2.2, v2.2…
+## $ Area_Ha    &lt;dbl&gt; 0.007144000, 2.685990255, 4.505765270, 0.006757025, 0.0320…
+## $ URN        &lt;fct&gt; ST7342523450, ST7353223464, ST7311723235, ST3716125868, ST…
+## $ Shape_Leng &lt;dbl&gt; 36.45851, 1340.06634, 926.33087, 54.10821, 252.52223, 25.3…
+## $ Shape_Area &lt;dbl&gt; 71.44000, 26859.90255, 45057.65270, 67.57025, 320.31930, 3…
+## $ geometry   &lt;POLYGON [m]&gt; POLYGON ((373419.5 123447, ..., POLYGON ((373719 1…</code></pre>
+<p>The column “Main_Habit” has the habitat types in it. So now we can use the carbonhabitats package to calculate the carbon storage and sequestration values for these habitats. The function carbonise in the package does this:</p>
+<pre class="r"><code>habs &lt;- carbonise(habs, habitats = &quot;Main_Habit&quot;)</code></pre>
+<p>The carbonise function adds columns to your dataframe that include the above ground (ABG) stored, soil and total stored carbon, plus the amount of carbon sequestered each year. Using some standard dplyr code we can produce a summary table of the amount of asbove ground carbon stored by each habitat:</p>
+<pre class="r"><code>storedc &lt;- habs %&gt;% 
+  as.data.frame() %&gt;% 
+  select(Main_Habit, storedC) %&gt;% 
+  group_by(Main_Habit) %&gt;% 
+  summarise(total_stored_C = round(sum(storedC), 0)) %&gt;% 
+  adorn_totals()
+
+knitr::kable(storedc)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Main_Habit</th>
+<th align="right">total_stored_C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Coastal and floodplain grazing marsh</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Deciduous woodland</td>
+<td align="right">215071</td>
+</tr>
+<tr class="odd">
+<td align="left">Good quality semi-improved grassland</td>
+<td align="right">1198</td>
+</tr>
+<tr class="even">
+<td align="left">Lowland calcareous grassland</td>
+<td align="right">651</td>
+</tr>
+<tr class="odd">
+<td align="left">Lowland dry acid grassland</td>
+<td align="right">49</td>
+</tr>
+<tr class="even">
+<td align="left">Lowland fens</td>
+<td align="right">50</td>
+</tr>
+<tr class="odd">
+<td align="left">Lowland heathland</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">Lowland meadows</td>
+<td align="right">3126</td>
+</tr>
+<tr class="odd">
+<td align="left">No main habitat but additional habitats present</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Purple moor grass and rush pastures</td>
+<td align="right">210</td>
+</tr>
+<tr class="odd">
+<td align="left">Reedbeds</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">Traditional orchard</td>
+<td align="right">6284</td>
+</tr>
+<tr class="odd">
+<td align="left">Total</td>
+<td align="right">226644</td>
+</tr>
+</tbody>
+</table>
+<p>And similarly the amount of carbon sequestered by each habitat annually:</p>
+<pre class="r"><code>sequesteredc &lt;- habs %&gt;% 
+  as.data.frame() %&gt;% 
+  select(Main_Habit, seqC) %&gt;% 
+  group_by(Main_Habit) %&gt;% 
+  summarise(total_seq_c = round(sum(seqC), 0)) %&gt;% 
+  adorn_totals()
+
+knitr::kable(sequesteredc)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Main_Habit</th>
+<th align="right">total_seq_c</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Coastal and floodplain grazing marsh</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Deciduous woodland</td>
+<td align="right">37212</td>
+</tr>
+<tr class="odd">
+<td align="left">Good quality semi-improved grassland</td>
+<td align="right">928</td>
+</tr>
+<tr class="even">
+<td align="left">Lowland calcareous grassland</td>
+<td align="right">504</td>
+</tr>
+<tr class="odd">
+<td align="left">Lowland dry acid grassland</td>
+<td align="right">38</td>
+</tr>
+<tr class="even">
+<td align="left">Lowland fens</td>
+<td align="right">15</td>
+</tr>
+<tr class="odd">
+<td align="left">Lowland heathland</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">Lowland meadows</td>
+<td align="right">2423</td>
+</tr>
+<tr class="odd">
+<td align="left">No main habitat but additional habitats present</td>
+<td align="right">NA</td>
+</tr>
+<tr class="even">
+<td align="left">Purple moor grass and rush pastures</td>
+<td align="right">163</td>
+</tr>
+<tr class="odd">
+<td align="left">Reedbeds</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">Traditional orchard</td>
+<td align="right">6731</td>
+</tr>
+<tr class="odd">
+<td align="left">Total</td>
+<td align="right">48018</td>
+</tr>
+</tbody>
+</table>
+<p>Incidentally, <code>adorn_totals()</code> is a useful function from the janitor package.</p>
+<p>So there we have it. A method for calculating the stored carbon and sequestered carbon for priority habitats in the UK.</p>
+</div>
+<div id="next-steps" class="section level2">
+<h2>Next steps</h2>
+<p>There are a few things to do. I need to make sure the code is robust to other versions of the names for priority habitats. Or persuade people to adopt a standard! The other thing that was pointed out by an early user was that I have added soil carbon to ponds, and I need to re-read the papers to work out how to deal with this. In the first instance I can remove soil carbon from ponds - that seems sensible. But I need to go back to the Taylor et al. (2019) paper to see exactly what is included in their estimates for carbon storage and burial. I also need to work on adding other priority habitats that are currently missing from the package.</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 3.6.3 (2020-02-29)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 20.04 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    
+##  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   
+##  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] janitor_2.0.1        dplyr_1.0.2          sf_0.9-5            
+## [4] carbonhabitats_1.0.0
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.5          highr_0.8           pillar_1.4.6       
+##  [4] compiler_3.6.3      class_7.3-15        tools_3.6.3        
+##  [7] digest_0.6.25       lubridate_1.7.9     evaluate_0.14      
+## [10] lifecycle_0.2.0     tibble_3.0.3        lattice_0.20-40    
+## [13] pkgconfig_2.0.3     rlang_0.4.7         cli_2.0.2          
+## [16] DBI_1.1.0           yaml_2.2.1          blogdown_0.20      
+## [19] xfun_0.15           e1071_1.7-3         exactextractr_0.4.0
+## [22] stringr_1.4.0       knitr_1.28          raster_3.3-13      
+## [25] generics_0.0.2      vctrs_0.3.4         classInt_0.4-3     
+## [28] grid_3.6.3          tidyselect_1.1.0    snakecase_0.11.0   
+## [31] glue_1.4.2          R6_2.4.1            fansi_0.4.1        
+## [34] rmarkdown_2.3       bookdown_0.20       sp_1.4-2           
+## [37] purrr_0.3.4         magrittr_1.5        codetools_0.2-16   
+## [40] ellipsis_0.3.1      htmltools_0.5.0     units_0.6-7        
+## [43] assertthat_0.2.1    utf8_1.1.4          KernSmooth_2.23-16 
+## [46] stringi_1.4.6       crayon_1.3.4</code></pre>
+</div>
