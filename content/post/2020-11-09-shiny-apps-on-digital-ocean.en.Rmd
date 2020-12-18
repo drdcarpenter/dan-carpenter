@@ -17,10 +17,10 @@ DisableComments: no
 ---
 
 ## DigitalOcean
-This is a quick post to detail (perhaps a strong word) how I managed to deploy a Shiny app via the new [DigitalOcean app platform](https://www.digitalocean.com/products/app-platform/).  For those of you not familiar with DigitalOCean, they are a cloud provider with offers such as servers, databases, Kubernertes (whatever that is!) and more.  I have been using their servers for a while for various little proj3ects, but the app platform is new.  In theory it makes deploying apps much easier.
+This is a quick post to detail (perhaps a strong word) how I managed to deploy a Shiny app via the new [DigitalOcean app platform](https://www.digitalocean.com/products/app-platform/).  For those of you not familiar with DigitalOCean, they are a cloud provider with offers such as servers, databases, Kubernertes (whatever that is!) and more.  I have been using their servers for a while for various little projects, but the app platform is new.  In theory it makes deploying apps much easier.
 
 ## Shiny
-So I wanted to know if I could deploy a Shiny app via the app platform.  I like Shiny apps - they are a great way to put the power of R in the hands of those who do not know how to write R code.  I built a couple of apps in my previous job for interrogating databases and running biodiversity index calculations.  But deployment has always been a bit of an issue.  I know RStudio has a couple of options, but I wasn't that keen on them.  Custom URLs were either a bit clunky or expensive and I want an option I can manage myself.  I tried setting up Shiny Server on a DigitalOcean droplet, but without much success.  So that app platform seems to provide a neat way to do this.
+So I wanted to know if I could deploy a Shiny app via the app platform.  I like Shiny apps - they are a great way to put the power of R in the hands of those who do not know how to write R code.  I built a couple of apps in my previous job for interrogating databases and running biodiversity index calculations.  But deployment has always been a bit of an issue.  I know RStudio has a couple of options, but I wasn't that keen on them.  Custom URLs were either a bit clunky or expensive and I want an option I can manage myself.  I tried setting up Shiny Server on a DigitalOcean droplet, but without much success.  So the app platform seems to provide a neat way to do this.
 
 ## Basic workflow
 The basic workflow is this:
@@ -87,7 +87,7 @@ If all is well you will find your code in your repository.  This is very much a 
 ## Deploy app on DigitalOcean
 So, you now have code for a Shiny app in a Github repository.  I am going to assume you have a DigitalOcean account, but if not sign up for one.  You can use my [referral link](https://m.do.co/c/1c82d179ee2d) which will give us both a bit of credit.
 
-In your account go to the 'Apps' menu and click on 'Create app'.  You will then need to connect to your Github repository from where DO will fetch your code. Remember to tick the continous deployment button; this means every time you push code to your repository, the app updates - like magic!
+In your account go to the 'Apps' menu and click on 'Create app'.  You will then need to connect to your Github repository from where DO will fetch your code. Remember to tick the continuous deployment button; this means every time you push code to your repository, the app updates - like magic!
 
 You then have to pick which data centre to use (limited at present) and the size of your server (I picked the smallest and cheapest one).  There may be one or two other things to do, but it is pretty simple.  Then hit deploy and hope fort the best.  It can take a while to build the image and deploy, but once it has there is a url to click to see the app.
 
@@ -108,6 +108,6 @@ So there you have it, a Shiny app deployed to DigitalOcean.
 I will come back to try and answer these questions at some point.
 
 ## Next steps
-For now I am going to go and develop a more useful (and probably more complex) app and test that.  I have a coupel fo ideas, so I will write about that when I have done so.
+For now I am going to go and develop a more useful (and probably more complex) app and test that.  I have a couple of ideas, so I will write about that when I have done so.
 
 In the meantime all of my code is on [GitHub](https://github.com/drdcarpenter/test-app/tree/master)
