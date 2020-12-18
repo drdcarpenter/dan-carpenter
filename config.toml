@@ -87,3 +87,9 @@ url = "mailto:drdcarpenter@googlemail.com"
   identifier = "cv"
   url = "/cv/"
   
+  [[menu.main]]
+  name = "apps"
+  weight = 500
+  identifier = "apps"
+  url = "app-dan-carpenter.co.uk"
+  
