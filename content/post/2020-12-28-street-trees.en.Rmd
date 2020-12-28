@@ -1,0 +1,83 @@
+---
+title: Street trees and their benefits
+author: Dan Carpenter
+date: '2020-12-28'
+slug: street-trees
+categories:
+  - R
+  - DigitalOcean
+tags:
+  - R
+  - Shiny
+  - apps
+Description: 'Exploring the benefits of street trees with a Shiny app'
+Tags: []
+Categories: []
+DisableComments: no
+---
+
+## Exploring the benefits of street trees with a Shiny app
+
+We receive an enormous number of benefits from trees.  They absorb carbon dioxide and produce oxygen, the remove pollution from the air, slow down the movement of water both cleaning it and preventing flooding.  They provide shade and shelter and they can make us feel better just by looking at them.  There has be an enormous amount written about trees and their benefits, and in the last couple of years the focus has been on them for their role in addressing the climate crisis: everyone wants to plant trees to absorb carbon dioxide, from governments to local wildlife groups and everyone in between.  Even the Queen is getting in on the act!
+
+So trees are good, but I worry that they are a useful distraction for some of the harder decisions that everyone needs to take to address the climate crisis - trees are not THE solution to that.  There are also plenty of stories of trees being planted in the wrong places and destroying things of far greater value, such as peat bogs or meadows.  However, there is one area where I think there should be greater focus on tree planting, and that is in urban areas.  All those benefits I spoke about above can be delivered right where people live, in urban areas, making them cleaner and nicer places to live, work and visit.  The global coronavirus pandemic has meant that, in the UK at least, more people are working from home, fewer are commuting to work, people are spending more time in their local areas and in local green spaces.  The quality of the environment where they live is much more important top people that it ever was.
+
+So I decided to explore the consequences of planting trees in my street here in Reading, UK, and to create an app to let other people do this too.  This post describes both the process of doing that, as well as the decisions I made in doing so.  You can explore the app [here](https://app-dan-carpenter.co.uk/street_trees/), or via the 'Apps' page on my website.
+
+## A bit about my street
+
+I live on Liverpool Road in Reading, UK.  This area of the town is called Newtown as it was the new part of town when it was built, but is was actually constructed in the late 1800's.  It is an area of Victorian terraced housing like that found in many towns up and down the UK that are the result of rapidly expanding industry in the late 1800's.  My house was constructed in 1890.  In some ways not much has changed since these houses were constructed, with the exception that most people now own a private car.  The streets were not designed to accommodate car parking and therefore the roads become quite narrow between two rows of parked cars.  I like living here, there is a sense of community that I am starting to feel I belong to.
+
+There are currently two trees on Liverpool Road, both very close to each other by the junction with another road where there is a bit of space for them.  There are of course other trees in peoples gardens, but mostly in the back gardens.  One is a Hawthorn (Crategous monogyna) and I am not sure what the other one is, as it was planted fairly recently and I have not yet been able to identify it.  This second tree replaced another Hawthorn which did not survive.
+
+## Car parking
+
+Planting new trees requires space.  The pavements are narrow and even a small tree would create a barrier, so they cannot be planted there.  This leaves the carriageway, which as I mentioned, is largely taken up with car parking and a single one way passage between them.  This means that planting trees in the carriageway (in a tree pit of course, not just hacking a hole out of the tarmac!) will reduce the parking capacity on the street.
+
+In order to account for this in my analysis, I counted the number of cars parked on the street and the number of spaces in which a car could be parked.  I only did this once, so it is a very crude estimate.  On the 16th November 2020 there were 144 cars parked on the road and an additional 28 spaces which could fit cars, meaning total car parking capacity for 173 spaces.  It is important to note that there are not parking bays marked out on the street, meaning that the parking is not very efficient.  I hypothesise that by marking out bays, the parking capacity would be increased.
+
+To estimate the potential parking capacity created from marking bays, I measured the amount of parking space in Liverpool Road from OpenStreetMap data and aerial imagery in QGIS.  I estimate that there is 995 metres of parking space on Liverpool Road.  This measurement won't be as accurate as getting out there with a tape measure, but I do not have a tape measure long enough for that!  According to Bracknell Forest Council's [parking standard](https://www.bracknell-forest.gov.uk/sites/default/files/documents/parking-standards-supplementary-planning-document-2016.pdf) a parking space should be 4.8 metres long.  If we are generous and allow 5 metres for a car parking space, the Liverpool Road has capacity for 199 spaces.  In theory then, just by marking out parking bays, it would be possible to increase parking capacity by 26 spaces.  I am aware that this does not incorporate space for accessible parking spaces, to the real number will be lower.
+
+## How many trees?
+
+How many trees could be planted in Liverpool Road?  Obviously the more trees the greater the benefits, but also the more parking capacity that would be absorbed.  So I decided to test some different scenarios.  In my last job I was working on the Oxfordshire Tree and Woodland Project and in their street tree analysis they used a minimum distance of 7 metres between street trees.  I am not sure of the origin of this value, but I have stuck with it.  Therefore trees would be planted at least 7 metres from another tree on the street.  I also used minimum distances of 14 metres and 28 metres to explore how tree density affects both benefits and parking.
+
+I needed to create some trees.  To do this I downloaded the OpenStreetMap data for Reading from the Geofabrik [downloads page](https://download.geofabrik.de/) and extracted the line data for the roads.  The road lines run down the centre of the roads, so I had to create parallel lines to get the lines at the edge of the road where the trees would be planted.  I used the parallel lines buffer tool from the QGIS processing tool box to do this.
+
+As a quick aside, the search function in the QGIS Processing toolbox is amazing.  I did not know if there was a tool to do parallel buffers, but I just types key words into the search box and hey presto, there are two!  It is fair to say that is possible to do most things with a QGIS processing tool and the search box helps you find the right one.
+
+Anyway, I now had parallel lines for my road centre line, and I used these lines to create points on for trees.  To do this I used the random points along lines tool in QGIS, setting a minimum distance between points and a maximum number of points, calculated from dividing the line lengths by the minimum distance between trees.  This worked out very well, so I now had three point data sets representing trees at different planting densities.  You can find out how many trees this is in the app!
+
+## What trees?
+
+Now I knew how many trees could be planted, I needed to decide what sort of trees they were.  The [Trees and Design Action Group](http://www.tdag.org.uk/species-selection-for-green-infrastructure.html) has a guide for the selection of tree species for green infrastructure.  I used this guide to select four species of tree that would cope with being planted in streets, that were not too big, and were reasonably resilient to pollution and drought.  I chose three UK native species and one European species: Field maple (Acer campestre), Hawthorn (Crategous monogyna), Cherry plum (Prunus cerasifera) and Swedish Whitebeam (Sorbus intermedia).  I wanted to pick mostly native species as they would have a value for biodiversity, as well as providing benefits to residents of Liverpool Road.  There are plenty of alternatives that could have been picked, each with their own pros and cons, but this is as good a species mix as any.
+
+I needed to assign these tree species to the points I had created and to do this I found a neat trick in R:
+
+`df %>% group_by(grp) %>% mutate(var_n = sample(var, size = n(), prob = probs, replace = TRUE))`
+
+where probs is a vector of probabilities: `probs <- c(0.30, 0.15, 0.30, 0.25)`
+
+I decided that the proportions of each species should be as follows:
+
+* Acer campestre - 30%
+* Crategous monogyna - 15%
+* Prunus cerasifera - 30%
+* Sorbus intermedia - 25%
+
+This mix prioritised shorter trees over taller trees.  I also set the diameter at breast height (DBH) to 9 cm for all the trees, deciding that this was a sensible size tree to be planting.
+
+In planting the trees I assumed they would be planted in [tree pits](https://stockholmtreepits.co.uk/) that are 1.2 metres by 1.2 metres.  Proper tree advice is of course required!
+
+## Calculating the benefits
+
+At this point I had decided how many trees I was proposing to plant, of which species and of what size.  What I needed to now do was calculate the benefits these trees would provide.  To do this I used the [i-Tree Eco tool](https://www.itreetools.org/tools/i-tree-eco).  This tool has been developed by the USDA Forest Service, the Davey Tree Expert Company and others to calculate the ecosystem service benefits of trees.  The Eco tool is just one among a suite of tools for doing this and much more.  It is a powerful tool for doing this, but in its simplest form, all it requires is the species of tree and its DBH.
+
+### A side note about i-Tree Eco
+
+The tool is available free to download from the i-Tree website.  However, it can only be run on Windows, which was a problem for me as I am an Ubuntu user.  Fortunately I have access to a Windows-based laptop so I was able to download and install it.  The Eco app is built in a .Net framework (I think) and uses an MS Access database as its back end.  As such it is a bit temperamental.  I had to install a bunch of patches and fixes to get it to run and it was by no means easy.  It is quite an old fashioned bit of software now and it really looks it.  The other weird things is you have to send your data away for analysis by the i-Tree server, which again harks back to a time when calculations like the ones sitting behind this were longer and memory intensive.  It is a bit clunky to be honest, and not the easiest thing to use.  For example, you can upload a csv file of data, but you have to rename columns or match columns to the one's Eco is expecting.  This is fine, but there is little guidance on what the values in the column should look like.  Nonetheless, I managed to get it running in the end.  I really wish there was an R package for this instead - all of the data and algorithms have been published I think, so in theory this is possible.  Maybe one day!
+
+Anyway, I plugged my data into the i-Tree Eco tool and sent it off for analysis and got back a marvelous csv file with all of the values for each tree.  I was expecting to have to do it for each set of point data, but I was able to use one analysis to apply values to each of the trees in my data.  This meant I could combine all of the trees into one data set.  There is lots of data in the csv file, including stored and sequestered carbon, removal rates for lots of pollutants and data on avoided water run-off.  I have decided to present only data on stored and sequestered carbon, and total pollution removed in my app.
+
+
+I now had all of the data I need to build a small interactive app to explore the benefits of street trees in Liverpool Road.
