@@ -1,7 +1,7 @@
 ---
 title: Street trees and their benefits
 author: Dan Carpenter
-date: '2020-12-28'
+date: '2020-12-31'
 slug: street-trees
 categories:
   - R
@@ -24,7 +24,8 @@ DisableComments: no
 <h2>Exploring the benefits of street trees with a Shiny app</h2>
 <p>We receive an enormous number of benefits from trees. They absorb carbon dioxide and produce oxygen, the remove pollution from the air, slow down the movement of water both cleaning it and preventing flooding. They provide shade and shelter and they can make us feel better just by looking at them. There has be an enormous amount written about trees and their benefits, and in the last couple of years the focus has been on them for their role in addressing the climate crisis: everyone wants to plant trees to absorb carbon dioxide, from governments to local wildlife groups and everyone in between. Even the Queen is getting in on the act!</p>
 <p>So trees are good, but I worry that they are a useful distraction for some of the harder decisions that everyone needs to take to address the climate crisis - trees are not THE solution to that. There are also plenty of stories of trees being planted in the wrong places and destroying things of far greater value, such as peat bogs or meadows. However, there is one area where I think there should be greater focus on tree planting, and that is in urban areas. All those benefits I spoke about above can be delivered right where people live, in urban areas, making them cleaner and nicer places to live, work and visit. The global coronavirus pandemic has meant that, in the UK at least, more people are working from home, fewer are commuting to work, people are spending more time in their local areas and in local green spaces. The quality of the environment where they live is much more important top people that it ever was.</p>
-<p>So I decided to explore the consequences of planting trees in my street here in Reading, UK, and to create an app to let other people do this too. This post describes both the process of doing that, as well as the decisions I made in doing so. You can explore the app <a href="https://app-dan-carpenter.co.uk/street_trees/">here</a>, or via the ‘Apps’ page on my website.</p>
+<p>So I decided to explore the consequences of planting trees in my street here in Reading, UK, and to create an app to let other people do this too. This post describes both the process of doing that, as well as the decisions I made in doing so.</p>
+<p>You can explore the app <a href="https://app-dan-carpenter.co.uk/street_trees/">here</a>, or via the ‘Apps’ page on my website.</p>
 </div>
 <div id="a-bit-about-my-street" class="section level2">
 <h2>A bit about my street</h2>
@@ -48,8 +49,11 @@ DisableComments: no
 <h2>What trees?</h2>
 <p>Now I knew how many trees could be planted, I needed to decide what sort of trees they were. The <a href="http://www.tdag.org.uk/species-selection-for-green-infrastructure.html">Trees and Design Action Group</a> has a guide for the selection of tree species for green infrastructure. I used this guide to select four species of tree that would cope with being planted in streets, that were not too big, and were reasonably resilient to pollution and drought. I chose three UK native species and one European species: Field maple (Acer campestre), Hawthorn (Crategous monogyna), Cherry plum (Prunus cerasifera) and Swedish Whitebeam (Sorbus intermedia). I wanted to pick mostly native species as they would have a value for biodiversity, as well as providing benefits to residents of Liverpool Road. There are plenty of alternatives that could have been picked, each with their own pros and cons, but this is as good a species mix as any.</p>
 <p>I needed to assign these tree species to the points I had created and to do this I found a neat trick in R:</p>
-<p><code>df %&gt;% group_by(grp) %&gt;% mutate(var_n = sample(var, size = n(), prob = probs, replace = TRUE))</code></p>
-<p>where probs is a vector of probabilities: <code>probs &lt;- c(0.30, 0.15, 0.30, 0.25)</code></p>
+<pre class="r"><code>df %&gt;% 
+  group_by(grp) %&gt;% 
+  mutate(var_n = sample(var, size = n(), prob = probs, replace = TRUE))</code></pre>
+<p>where probs is a vector of probabilities:</p>
+<pre class="r"><code>probs &lt;- c(0.30, 0.15, 0.30, 0.25)</code></pre>
 <p>I decided that the proportions of each species should be as follows:</p>
 <ul>
 <li>Acer campestre - 30%</li>
@@ -72,4 +76,152 @@ DisableComments: no
 <p>Anyway, I plugged my data into the i-Tree Eco tool and sent it off for analysis and got back a marvelous csv file with all of the values for each tree. I was expecting to have to do it for each set of point data, but I was able to use one analysis to apply values to each of the trees in my data. This meant I could combine all of the trees into one data set. There is lots of data in the csv file, including stored and sequestered carbon, removal rates for lots of pollutants and data on avoided water run-off. I have decided to present only data on stored and sequestered carbon, and total pollution removed in my app.</p>
 <p>I now had all of the data I need to build a small interactive app to explore the benefits of street trees in Liverpool Road.</p>
 </div>
+</div>
+<div id="the-app" class="section level2">
+<h2>The app</h2>
+<p>The app itself is a fairly simple Shiny app. I have used the {shinydashboard} package for the main components, but there is only one tab, so it was not strictly necessary. However, I think it looks slightly nicer than a vanilla shiny app.</p>
+<p>The app uses a single csv file with all of the data in it. There is a dropdown menu to select the distance between trees and then there is a map and some value boxes which update with the data. A map shows the indicative position of the trees and is colour coded by species. That proved to be a bit tricky, so I will explore that a bit further here. I had to create a palette for the species in the csv as follows:</p>
+<pre class="r"><code>pal &lt;- colorFactor(topo.colors(4), street_trees$Species)</code></pre>
+<p>This essentially assigns a color to each species in the csv file. I was then able to pass this palette as an argument to both the markers and the legend like so:</p>
+<pre class="r"><code>leaflet(st()) %&gt;%
+            addTiles() %&gt;%
+            setView(-0.94680369, 51.456922, zoom = 16) %&gt;%
+            addCircleMarkers(lat = ~y, lng = ~x, radius = 1, color = ~pal(Species)) %&gt;% 
+           addLegend(position = &quot;topright&quot;, pal = pal, values = st()$Species, title = &quot;Tree species&quot;)</code></pre>
+<p>In an earlier version of the app I had a table with the values for carbon and pollution in it, but it didn’t look that good. So I decided to use value boxes to display these values instead. I think these better communicate the different values than a table, but others might find a table more useful. To update these value boxes there are two bits of reactive code required to respond to a change int he selection from the dropdown menu. The first is to filter the csv data to those trees with ‘centres’ (i.e. distances between trees) that meet the dropdown value. The second was to calculate the car parking spaces. For both of these I used the <code>eventReactive()</code> function, as in the following example:</p>
+<pre class="r"><code>sts &lt;- eventReactive(input$centre, {
+        filter(street_trees, centres == input$centre) %&gt;%
+            summarise(`Carbon stored (kg)` = sum(Carbon_Storage_kg),
+                      `Carbon Sequestered (kg/yr)` = sum(Carbon_Sequestration_kg_yr),
+                      `Pollution Removed (g/yr)` = sum(Pollution_Removal_g_yr))</code></pre>
+<p>This bit of code also calculates the total values for the value boxes. And that is it really. The value boxes were fun to produce, deciding on colours and trying to find suitable icons for them. I’m not entirely happy with the icons I have used, but they were the best ones I could find. I didn’t spend a lot of time on this, so there may be better options in a different icon library.</p>
+</div>
+<div id="deploying-the-app" class="section level2">
+<h2>Deploying the app</h2>
+<p>To deploy the app I am using the <a href="https://www.digitalocean.com/products/app-platform/">DigitalOcean app platform</a>. I have written a bit about this <a href="https://dan-carpenter.co.uk/2020/11/09/shiny-apps-on-digital-ocean/">before</a>, but I have learned a bit more about deploying apps using this since then, so here I will describe what I did this time.</p>
+<p>The main thing that is required for deploying a Shiny app on DO is a Dockerfile. DO essentially creates a Docker container to serve the app in. Fortunately the amazing <a href="https://www.rocker-project.org/">Rocker</a> project has done a lot of the hard work for R folk by providing images for common R applications. I was able to use one of their images for Shiny to base my own image on. A Dockerfile is essentially a set of instructions for how to build an image which has all of the things that you need for running a Shiny app - an operating system, some system libraries, some R packages, Shiny server and of course your app. The Dockerfile looks like this:</p>
+<pre class="r"><code># Base image https://hub.docker.com/u/rocker/
+FROM rocker/shiny:latest
+
+# system libraries of general use
+## install debian packages
+RUN apt-get update -qq &amp;&amp; apt-get -y --no-install-recommends install \
+    libxml2-dev \
+    libcairo2-dev \
+    libsqlite3-dev \
+    libmariadbd-dev \
+    libpq-dev \
+    libssh2-1-dev \
+    unixodbc-dev \
+    libcurl4-openssl-dev \
+    libssl-dev
+
+## update system libraries
+RUN apt-get update &amp;&amp; \
+    apt-get upgrade -y &amp;&amp; \
+    apt-get clean
+
+# install R packages
+RUN R -e &quot;install.packages(&#39;shinydashboard&#39;)&quot;
+
+RUN R -e &quot;install.packages(c(&#39;leaflet&#39;, &#39;readr&#39;, &#39;dplyr&#39;, &#39;DT&#39;), dependencies=TRUE, repos=&#39;http://cran.rstudio.com/&#39;)&quot;
+
+# copy necessary files
+## app folder
+COPY app.R /srv/shiny-server/street_trees/
+COPY street_trees.csv /srv/shiny-server/street_trees/
+
+RUN sudo rm /srv/shiny-server/index.html
+COPY index.html /srv/shiny-server/index.html
+COPY /index_files /srv/shiny-server/index_files/
+COPY dc_temp.jpg /srv/shiny-server/dc_temp.jpg</code></pre>
+<p>The first line grabs the Shiny image from Rocker. Then there is some standard Linux command line stuff to install and update the libraries for the OS (in this case Debian). Next comes the commands to install R packages to make them available inside the container. For some reason, the {shinydashboard} package would not install as part of the second line of install code and I do not know why. It installed fine when I did it on its own!</p>
+<p>Next you have to copy your app into the shinyserver file directory. Shinyserver is rather clever as if there is an app in the directory, it will serve it, no questions asked. I added the app into a folder all of its own, along with the csv file that is read in by the app. This means when you go to the app.URL/street_trees/ the app will be waiting there for you.</p>
+<p>The final bit of the Dockerfile is about replacing the standard shinyserver landing page with one I created myself.</p>
+<div id="landing-page" class="section level3">
+<h3>Landing page</h3>
+<p>I wanted my own personalised landing page for my shinyserver and to do this I used the excellent <a href="https://github.com/seankross/postcards">postcards</a> package. The package is now on CRAN, but I was using a version from Github at the time. Postcards makes it really easy to make single page websites in RMarkdown. One of the templates was close enough to the look of my main website, so I went with that. The basic page is great, but I decided I wanted a nice button to take you to the app page. I used the wonderful <a href="https://www.w3schools.com/html/default.asp">w3schools</a> to play about with some html and css to create a button I was happy with and to place it in a table so it displays nicely. What this did do was mess up my social media links, which were not working anyway, but the updated postcards package is a little different, so I may implement the new code and see if it works. Here is the code for this basic page:</p>
+<pre class="r"><code>---
+title: &quot;Hello, I&#39;m Dan Carpenter&quot;
+image: &quot;dc_temp.jpg&quot;
+# links:
+#   - LinkedIn: &quot;https://www.linkedin.com/in/dan-carpenter-cenv-057b512a/&quot;
+#   - Twitter: &quot;https://twitter.com/drdcarpenter&quot;
+#   - GitHub: &quot;https://github.com/drdcarpenter&quot;
+output:
+  postcards::trestles
+---
+ 
+## My Apps
+
+Here are some apps I have made using Shiny and R.
+
+&lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css&quot;&gt;
+&lt;style&gt;
+.btn {
+  background-color: DarkGrey;
+  border: none;
+  color: white;
+  padding: 12px 16px;
+  text decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Darker background on mouse-over */
+.btn:hover {
+  background-color: Green;
+}
+
+.button2 {border-radius: 4px;}
+
+&lt;/style&gt;
+
+&lt;table style=&quot;width:100%&quot;&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;a href=&quot;/street_trees/&quot; target=&quot;_blank&quot;&gt;&lt;button class=&quot;btn button2&quot;&gt;&lt;i class=&quot;fa fa-tree&quot;&gt;&lt;/i&gt; Street Trees app&lt;/button&gt;&lt;/a&gt;&lt;/td&gt;
+    &lt;td&gt;A Shiny application to explore the benefits we gain from street tree planting.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+<p>Having created the landing page, it is necessary to delete the existing index.html page and copy across the new one and all of the files and folders it requires.</p>
+</div>
+<div id="deploy" class="section level3">
+<h3>Deploy!</h3>
+<p>Deploying is then as simple (when it works!) as connecting DO to your Github repo and waiting for it to build and deploy. This time around I was also able to add a custom domain name to my app. I created a CNAME record for my domain and that redirects traffic to the app. A note here if you are doing this and the custom domain doesn’t work - note the port that the app is using from the deploy logs. For me the domain was set to using a different port and correcting this to the one in the logs sorted out the problem. Now when you go to the URL, the app works.</p>
+</div>
+</div>
+<div id="code" class="section level2">
+<h2>Code</h2>
+<p>All of the code for the app, the Dockerfile and the postcards Rmd is on <a href="https://github.com/drdcarpenter/street_trees">Github</a> and you can access the app via the ‘App’ menu at the top of my website.</p>
+</div>
+<div id="feedback" class="section level2">
+<h2>Feedback</h2>
+<p>I would be very pleased to receive feedback on the app and the general idea of additional street trees and the benefits they could provide. There is currently a funding drive for more trees in Reading, but I am not sure if anyone has decided <em>where</em> these trees will go. I hope it is not on existing green space of value and I would like to think one of the aims of this tree planting is to improve the environment of residents in Reading. We will see! Anyway, you can get in touch via Twitter, LinkedIn or email - all the details are on my website.</p>
+</div>
+<div id="session-info" class="section level2">
+<h2>Session Info</h2>
+<pre><code>## R version 3.6.3 (2020-02-29)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 20.04 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    
+##  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   
+##  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## loaded via a namespace (and not attached):
+##  [1] compiler_3.6.3  magrittr_2.0.1  bookdown_0.20   tools_3.6.3    
+##  [5] htmltools_0.5.0 yaml_2.2.1      stringi_1.4.6   rmarkdown_2.5  
+##  [9] blogdown_0.20   knitr_1.30      stringr_1.4.0   digest_0.6.27  
+## [13] xfun_0.19       rlang_0.4.9     evaluate_0.14</code></pre>
 </div>
