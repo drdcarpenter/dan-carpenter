@@ -43,40 +43,43 @@ DisableComments: no
 <h2>Create an app</h2>
 <p>For the purposes of my demo, I just used the default app that is created when you start a new project in RStudio.</p>
 <div class="figure">
-<img src="Shiny_project.png" alt="" />
-<p class="caption">Create a new project in RStudio</p>
+<img src="/post/2020-11-09-shiny-apps-on-digital-ocean.en_files/Shiny_project.png" alt="" />
+<p class="caption">Example Shiny app project in RStudio</p>
 </div>
 <p>This is a very basic demo app, but for my purposes is more than adequate to test how to deploy it. Obviously I need to create something a bit more interesting or useful to explore the app platform fully.</p>
 <div class="figure">
-<img src="shiny_app.png" alt="" />
-<p class="caption">Test Shiny app</p>
+<img src="/post/2020-11-09-shiny-apps-on-digital-ocean.en_files/shiny_app.png" alt="" />
+<p class="caption">Example of the default Shiny app in RStudio</p>
 </div>
 </div>
 <div id="create-a-dockerfile" class="section level2">
 <h2>Create a Dockerfile</h2>
 <p>The DO app platform comes with built in support for lots of languages, but R isn’t one of them (yet). However, you can use Docker to deploy apps written in other languages. I will not provide a full run down of Docker here (see <a href="https://colinfay.me/docker-r-reproducibility/">Colin Fay’s introduction</a>), but suffice it to say that Docker provides a virtual environment to run applications. This includes an operating system and all of the other dependencies (like R, R packages etc…) needed to run an app. There is an excellent project called <a href="https://www.rocker-project.org/">Rocker</a> that provides Docker images for R projects, and I used one of these as a base for my deploy.</p>
 <p>What we need to use Docker for deployment is a Dockerfile. This is essentially a set of instructions which tells Docker what resources are required in a container. I faffed around with this for a while, but in the end my Dockerfile is quite simple. Here is the result:</p>
-<p><code># Base image https://hub.docker.com/u/rocker/</code><br />
-<code>FROM rocker/shiny:latest</code></p>
-<p><code># system libraries of general use</code><br />
-<code>## install debian packages</code><br />
-<code>RUN apt-get update -qq &amp;&amp; apt-get -y --no-install-recommends install \</code><br />
-<code>libxml2-dev \</code><br />
-<code>libcairo2-dev \</code><br />
-<code>libsqlite3-dev \</code><br />
-<code>libmariadbd-dev \</code><br />
-<code>libpq-dev \</code><br />
-<code>libssh2-1-dev \</code><br />
-<code>unixodbc-dev \</code><br />
-<code>libcurl4-openssl-dev \</code><br />
-<code>libssl-dev'</code></p>
-<p><code>## update system libraries</code><br />
-<code>RUN apt-get update &amp;&amp; \</code><br />
-<code>apt-get upgrade -y &amp;&amp; \</code><br />
-<code>apt-get clean</code></p>
-<p><code># copy necessary files</code><br />
-<code>## app folder</code><br />
-<code>COPY app.R /srv/shiny-server/app/</code></p>
+<pre class="r"><code># Base image https://hub.docker.com/u/rocker/
+FROM rocker/shiny:latest
+
+# system libraries of general use
+## install debian packages
+RUN apt-get update -qq &amp;&amp; apt-get -y --no-install-recommends install \
+    libxml2-dev \
+    libcairo2-dev \
+    libsqlite3-dev \
+   libmariadbd-dev \
+    libpq-dev \
+    libssh2-1-dev \
+    unixodbc-dev \
+    libcurl4-openssl-dev \
+    libssl-dev&#39;
+
+## update system libraries
+RUN apt-get update &amp;&amp; \
+    apt-get upgrade -y &amp;&amp; \
+    apt-get clean
+
+# copy necessary files
+## app folder
+COPY app.R /srv/shiny-server/app/</code></pre>
 <p>The first line, FROM, is to pull the base image from Rocker; this is like installing an R package. The following section installs a bunch of system libraries that may be necessary to run R code. To be honest I don’t know what all of these are (I recognise some e.g. sqlite database) but I do not know if they are strictly necessary. The third section is some standard command line code for updating Debian package repositories and operating system security updates etc.</p>
 <p>The final bit is key. Essentially it copies your app file (app.R) into a directory on Shiny server. This means Shiny server will automatically pick up the app and serve it from this folder.</p>
 <p>I had previously used the <code>renv</code> package in R to manage packages for the app, but as it only used the Shiny package it wasn’t strictly necessary so I have not included that here.</p>
