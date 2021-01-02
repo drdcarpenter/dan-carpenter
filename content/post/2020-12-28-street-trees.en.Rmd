@@ -45,10 +45,14 @@ To estimate the potential parking capacity created from marking bays, I measured
 How many trees could be planted in Liverpool Road?  Obviously the more trees the greater the benefits, but also the more parking capacity that would be absorbed.  So I decided to test some different scenarios.  In my last job I was working on the Oxfordshire Tree and Woodland Project and in their street tree analysis they used a minimum distance of 7 metres between street trees.  I am not sure of the origin of this value, but I have stuck with it.  Therefore trees would be planted at least 7 metres from another tree on the street.  I also used minimum distances of 14 metres and 28 metres to explore how tree density affects both benefits and parking.
 
 I needed to create some trees.  To do this I downloaded the OpenStreetMap data for Reading from the Geofabrik [downloads page](https://download.geofabrik.de/) and extracted the line data for the roads.  The road lines run down the centre of the roads, so I had to create parallel lines to get the lines at the edge of the road where the trees would be planted.  I used the parallel lines buffer tool from the QGIS processing tool box to do this.
+![QGIS window for v.parallel algorithm](/post/2020-12-28-street-trees.en_files/v.parallel.png)
 
 As a quick aside, the search function in the QGIS Processing toolbox is amazing.  I did not know if there was a tool to do parallel buffers, but I just types key words into the search box and hey presto, there are two!  It is fair to say that is possible to do most things with a QGIS processing tool and the search box helps you find the right one.
 
-Anyway, I now had parallel lines for my road centre line, and I used these lines to create points on for trees.  To do this I used the random points along lines tool in QGIS, setting a minimum distance between points and a maximum number of points, calculated from dividing the line lengths by the minimum distance between trees.  This worked out very well, so I now had three point data sets representing trees at different planting densities.  You can find out how many trees this is in the app!
+Anyway, I now had parallel lines for my road centre line, and I used these lines to create points on for trees.  To do this I used the random points along lines tool in QGIS, setting a minimum distance between points and a maximum number of points, calculated from dividing the line lengths by the minimum distance between trees.
+![QGIS window for the random points algorithm](/post/2020-12-28-street-trees.en_files/random_points.png)
+
+This worked out very well, so I now had three point data sets representing trees at different planting densities.  You can find out how many trees this is in the app!
 
 ## What trees?
 
