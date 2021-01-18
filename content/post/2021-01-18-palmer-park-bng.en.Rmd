@@ -14,6 +14,14 @@ Categories: [R, QGIS, habitats, biodiversity]
 DisableComments: no
 ---
 
+```{r set up, echo=FALSE, message=FALSE, warning=FALSE}
+
+# need to add the metric code here
+# or add it later?
+
+```
+
+
 ## Introduction
 
 Palmer Park is in the Park ward of east Reading (UK).  It has a leisure centre among its facilities and there is a planning proposal to extend this centre to create a swimming pool.  East Reading used to have a swimming pool at Arthur Hill - a Victorian baths which Reading Borough Council sold and is now being turned into housing.  The leisure centre extension is the Council's proposal to provide a new swimming pool in east Reading, as well as other new facilities.
@@ -78,5 +86,11 @@ pdf_convert(pdf_file)
 
 Anyway, once I had the image georeferenced, I was able to trace the red line as a vector layer in QGIS.  This was then the starting point to map the habitats on the site.  There is an ecology report submitted withe application.  I know the firm who did it well and they are a good outfit, so I am confident in their assessments.  Their maps was not to scale however, so it was not possible to use that to create the habitats data.  Instead I used aerial imagery to split up this redline into the different habitats, using the ecology report as a guide for the habitat types.
 
+I now had the different habitat parcels mapped and areas for each of them calculated in QGIS.  Here is a map showing those habitats.
 
+
+
+## Entering baseline data into the metric
+
+I entered the habitat types and areas into the metric.  It automatically applies a 'distinctiveness'score - this is 
 
