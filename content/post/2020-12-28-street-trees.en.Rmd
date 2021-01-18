@@ -11,8 +11,8 @@ tags:
   - Shiny
   - apps
 Description: 'Exploring the benefits of street trees with a Shiny app'
-Tags: []
-Categories: []
+Tags: [R, Shiny, trees, DigitalOCean]
+Categories: [R, Shiny, trees, DigitalOcean]
 DisableComments: no
 ---
 

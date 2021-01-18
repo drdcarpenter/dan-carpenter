@@ -1,0 +1,82 @@
+---
+title: Palmer Park leisure centre and biodiversity net gain
+author: Dan Carpenter
+date: '2021-01-18'
+slug: palmer-park-bng
+categories:
+  - habitats
+  - R
+tags:
+  - R
+Description: 'Biodiversity net gain assessment for proposed leisure centre in Palmer Park'
+Tags: [R, QGIS, habitats, biodiversity]
+Categories: [R, QGIS, habitats, biodiversity]
+DisableComments: no
+---
+
+## Introduction
+
+Palmer Park is in the Park ward of east Reading (UK).  It has a leisure centre among its facilities and there is a planning proposal to extend this centre to create a swimming pool.  East Reading used to have a swimming pool at Arthur Hill - a Victorian baths which Reading Borough Council sold and is now being turned into housing.  The leisure centre extension is the Council's proposal to provide a new swimming pool in east Reading, as well as other new facilities.
+
+This post details my assessment of the application and its ability to deliver a biodiversity net gain in accordance with the National Planning Policy Framework.  It is also an opportunity to develop some R code to process the biodiversity metric which is key to calculating net gain.
+
+I do this stuff in my day job, so I have a lot of experience in biodiversity net gain - it is in my job title.  I also help teach other UK ecologists (and some from elsewhere in Europe) how to use the biodiversity metric for the Chartered Institute of Ecology and Environmental Management.  However, what follows is merely my professional opinion and is not definitive.
+
+The application itself does not include an assessment of biodiversity net gain, despite biodiversity net gain being a requirement of both national and local planning policy, as I set out below.  Why this is, I do not know.
+
+## Biodiversity net gain
+
+First a little bit about biodiversity net gain - what is it?  Simply put it is development that leaves biodiversity in a better state than before.  For example, in this case, the leisure centre development must leave biodiversity in a better state than it is now, before the development takes place (assuming it is approved of course).  What do we mean by biodiversity?  Well in this case it is restricted to habitats, which of course ignores all of the other biodiversity in the world; genes, species and ecosystems.  But that is how the metric works.
+
+## Planning policy
+
+The National Planning Policy Framework ([NPPF](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/810197/NPPF_Feb_2019_revised.pdf)) is the document that guides planning in England.  In it there are specific references to biodiversity net gain.
+
+Paragraph 170 of the NPPF states:
+
+>Planning policies and decisions should contribute to and enhance the natural and local environment by:...
+
+>d)  minimising impacts on and **providing net gains for biodiversity**, including by establishing coherent ecological networks that are more resilient to current and future pressures;...
+
+Paragraph 174 of the NPPF states:    
+
+>To protect and enhance biodiversity and geodiversity, plans should:...
+
+>b)  promote the conservation, restoration and enhancement of priority habitats, ecological networks and the protection and recovery of priority species; and identify and pursue opportunities for **securing measurable net gains for biodiversity**.
+
+
+The NPPF is very clear, development should provide measurable net gains for biodiversity.  The metric (more on that in a minute) provides the means to measure net gain.
+
+Reading Borough Council has a [Local Plan adopted in 2019](https://images.reading.gov.uk/2019/12/Local_Plan_Adopted_November_2019.pdf).  This sets out local policy for planning.  In it there is policy EN12 which says:
+
+>b)  On all sites, development should not result in a net loss of biodiversity and geodiversity, and **should provide a net gain for biodiversity** wherever possible.  
+
+So Reading Borough Council's Local Plan also says that development should provide a net gain in biodiversity.  So let's see if the leisure centre proposals do!
+
+## The metric
+
+I have mentioned this a few times now, but 'the metric' is a spreadsheet based calculator for biodiversity net gain assessments.  It was put together by Natural England staff and it is free to download from [their website](http://publications.naturalengland.org.uk/publication/5850908674228224).  It is currently undergoing a revision, the new version due out in 'Spring 20201'.
+
+Essentially, the metric works by calculating the difference between the habitats on a site before and after a development to see if there is a net gain.  It is a little bit more complicated than that, but that is the basics.  It does require a good habitats survey and an assessment of the habitats condition.  It also really needs those habitats mapping in GIS or a CAD system to that the areas of the habitats can be accurately calculated.
+
+Here I will run through how I calculated the net change in biodiversity units from the information available on the Reading BC planning portal and some data I created using GIS.  It is important to note that the data I am going to run through below is data I have created and may not be an accurate reflection of the exact scheme, but it is the best I can do with the information available.
+
+## Baseline habitats
+
+The first thing to do is calculate the baseline habitats for the development site.  But before I could do that I have to map the red line boundary - or the boundary of the application site.  This was provided as a pdf on the planning portal:
+
+![map showing red line boundary for application site](/post/2021-01-18-palmer-park-bng.en_files/00467504_1.png)
+
+I had to convert this into a png file so that I could georeference it in QGIS.  There is a handy little library in R for doing this: pdftools.  The code below shows how to convert a pdf to a png file.  I am trying to get this to run as a script in QGIS, but so far I have not had any luck.  The first time I tried, QGIS spent hours installing packages, despite many of them already being installed in R.  I need to try again.
+
+```{r convert pdf, eval=FALSE, echo=TRUE}
+library(pdftools)
+
+pdf_file <- file.path("mypdf.pdf")
+pdf_convert(pdf_file)
+```
+
+Anyway, once I had the image georeferenced, I was able to trace the red line as a vector layer in QGIS.  This was then the starting point to map the habitats on the site.  There is an ecology report submitted withe application.  I know the firm who did it well and they are a good outfit, so I am confident in their assessments.  Their maps was not to scale however, so it was not possible to use that to create the habitats data.  Instead I used aerial imagery to split up this redline into the different habitats, using the ecology report as a guide for the habitat types.
+
+
+
