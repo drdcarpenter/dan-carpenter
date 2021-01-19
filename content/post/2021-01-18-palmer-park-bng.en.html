@@ -70,17 +70,25 @@ DisableComments: no
 <p>The first thing to do is calculate the baseline habitats for the development site. But before I could do that I have to map the red line boundary - or the boundary of the application site. This was provided as a pdf on the planning portal:</p>
 <div class="figure">
 <img src="/post/2021-01-18-palmer-park-bng.en_files/00467504_1.png" alt="" />
-<p class="caption">map showing red line boundary for application site</p>
+<p class="caption">Map showing red line boundary for application site</p>
 </div>
 <p>I had to convert this into a png file so that I could georeference it in QGIS. There is a handy little library in R for doing this: pdftools. The code below shows how to convert a pdf to a png file. I am trying to get this to run as a script in QGIS, but so far I have not had any luck. The first time I tried, QGIS spent hours installing packages, despite many of them already being installed in R. I need to try again.</p>
 <pre class="r"><code>library(pdftools)
 
 pdf_file &lt;- file.path(&quot;mypdf.pdf&quot;)
 pdf_convert(pdf_file)</code></pre>
-<p>Anyway, once I had the image georeferenced, I was able to trace the red line as a vector layer in QGIS. This was then the starting point to map the habitats on the site. There is an ecology report submitted withe application. I know the firm who did it well and they are a good outfit, so I am confident in their assessments. Their maps was not to scale however, so it was not possible to use that to create the habitats data. Instead I used aerial imagery to split up this redline into the different habitats, using the ecology report as a guide for the habitat types.</p>
+<p>Anyway, once I had the image georeferenced, I was able to trace the red line as a vector layer in QGIS. This was then the starting point to map the habitats on the site. There is an ecology report submitted withe application. I know the firm who did it well and they are a good outfit, so I am confident in their assessments. Their maps was not to scale however, so it was not possible to use that to create the habitats data. Instead I used aerial imagery to split up this red line into the different habitats, using the ecology report as a guide for the habitat types.</p>
 <p>I now had the different habitat parcels mapped and areas for each of them calculated in QGIS. Here is a map showing those habitats.</p>
+<div class="figure">
+<img src="/post/2021-01-18-palmer-park-bng.en_files/existing_habitats_small.png" alt="" />
+<p class="caption">Map of existing habitats on development site</p>
+</div>
 </div>
 <div id="entering-baseline-data-into-the-metric" class="section level2">
 <h2>Entering baseline data into the metric</h2>
-<p>I entered the habitat types and areas into the metric. It automatically applies a ’distinctiveness’score - this is</p>
+<p>I entered the habitat types and areas into the metric. It automatically applies a ‘distinctiveness’ score - this is a measure of a habitats importance for wildlife. I entered a condition score, following the guidance in the technical document that accompanies the metric. Connectivity scores are a function of distinctiveness - if distinctiveness is ‘Low’ or ‘Medium’ connectivity is ‘Low’. If distinctiveness is ‘High’ or ‘Very High’ then connectivity is ‘Medium’. This rule is set out in the user guide. Strategic significance relates tot he importance of a habitat in a particular location. I wrote a little bit about this on <a href="https://www.linkedin.com/pulse/strategic-significance-biodiversity-net-gain-dan-carpenter-cenv/">LinkedIn</a>. Essentially, if the location of the habitat has been identified as important for nature conservation then it is said to be strategically significant. Palmer Park does not fall into this category and therefore strategic significance is ‘Low’. Entering all of these data into the metric gives you a total unit score for the site. This is summarised in the table below.</p>
+<p>The baseline habitats generate n biodiversity units.</p>
+</div>
+<div id="retained-habitats" class="section level2">
+<h2>Retained habitats</h2>
 </div>
