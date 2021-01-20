@@ -103,5 +103,25 @@ The baseline habitats generate n biodiversity units.
 
 ## Retained habitats
 
+Now that the baseline is mapped, the habitats proposed by the development need to be mapped to carry out the net gain calculation.  For this I used a plan of the development as submitted with the application.  This is it.
 
+
+
+The differences are that some of the amenity grassland is lost to create a larger car park, but some different small areas are created in the new car park.  The woodladn in the application boundary is also beign removed as part of the development proposals.  Given the location, I am not sure that all that parking space is necessary - surely we should be encourage to walk, cycle or get the bus to the leisure centre!  Anyway, that is editorialising!  I was able to map the habitats and calculate the area of each habitat.  I assigned future condition appropriately adn all of the other parameters remained the same.  A map of the proposed habitats is below.
+
+[insert map]
+
+The proposed scheme generates n biodiversity units, as summariesed int he table below.
+
+[insert table]
+
+# Net change in biodiversity
+
+As can be seen from the next table, the scheme does not deliver a net gain in biodiversity.  There is a net loss of n units (or -n%).  As such the scheme does not accord with the NPPF or Local Plan policy EN12 and should be rejected.
+
+[insert table here]
+
+# Delivering a net gain  for biodiversity
+
+It would be possible to deliver a net gain for biodiversity by enhancing an area of grassland within the park.  I have looked at how much land would be required and what the enhancement should be.  The metric is designed so that any losses are offset
 
