@@ -16,8 +16,46 @@ DisableComments: no
 
 ```{r set up, echo=FALSE, message=FALSE, warning=FALSE}
 
-# need to add the metric code here
-# or add it later?
+library(openxlsx)
+library(dplyr)
+library(janitor)
+library(readr)
+
+metric <- "/home/danc/Documents/palmer_park/Palmer Park Biodiversity Metric 2.0 Calculation Tool Beta Test - December 2019 Update.xlsm"
+
+m <- loadWorkbook(metric)
+
+baseline <- function(metric){
+  
+  b <- read.xlsx(metric, sheet = 9, startRow = 4, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %>% 
+    select(2:5, 7, 9, 13, 16) %>% 
+    remove_empty(which = c("rows", "cols")) %>% 
+    row_to_names(row_number = 2, remove_row = TRUE)
+  
+  b$`Area (hectares)` <-  as.numeric(as.character(b$`Area (hectares)`))
+  b$`Total habitat units` <- as.numeric(as.character(b$`Total habitat units`))
+  
+  return(b)
+  
+}
+
+#baseline(m)
+
+proposed <- function(metric){
+  
+  p <- read.xlsx(metric, sheet = 10, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %>% 
+    select(1:3, 5, 7, 11, 17) %>% 
+    remove_empty(which = c("rows", "cols")) %>% 
+    row_to_names(row_number = 4, remove_row = TRUE) %>% 
+    rename(`Strategic Significance` = 6) %>% 
+    slice(-1)
+  
+  p$`Area (hectares)` <- as.numeric(as.character(p$`Area (hectares)`))
+  p$`Habitat units delivered` <- as.numeric(as.character(p$`Habitat units delivered`))
+  
+  return(p)
+  
+}
 
 ```
 
@@ -92,36 +130,64 @@ I now had the different habitat parcels mapped and areas for each of them calcul
 
 ## Entering baseline data into the metric
 
-I entered the habitat types and areas into the metric.  It automatically applies a 'distinctiveness' score - this is a measure of a habitats importance for wildlife.  I entered a condition score, following the guidance in the technical document that accompanies the metric.  Connectivity scores are a function of distinctiveness - if distinctiveness is 'Low' or 'Medium' connectivity is 'Low'.  If distinctiveness is 'High' or 'Very High' then connectivity is 'Medium'.  This rule is set out in the user guide.  Strategic significance relates tot he importance of a habitat in a particular location.  I wrote a little bit about this on [LinkedIn](https://www.linkedin.com/pulse/strategic-significance-biodiversity-net-gain-dan-carpenter-cenv/).  Essentially, if the location of the habitat has been identified as important for nature conservation then it is said to be strategically significant.  Palmer Park does not fall into this category and therefore strategic significance is 'Low'.  Entering all of these data into the metric gives you a total unit score for the site.  This is summarised in the table below.
+I entered the habitat types and areas into the metric.  It automatically applies a 'distinctiveness' score - this is a measure of a habitats importance for wildlife.  I entered a condition score, following the guidance in the technical document that accompanies the metric.  Connectivity scores are a function of distinctiveness - if distinctiveness is 'Low' or 'Medium' connectivity is 'Low'.  If distinctiveness is 'High' or 'Very High' then connectivity is 'Medium'.  This rule is set out in the user guide.  Strategic significance relates to the importance of a habitat in a particular location.  I wrote a little bit about this on [LinkedIn](https://www.linkedin.com/pulse/strategic-significance-biodiversity-net-gain-dan-carpenter-cenv/).  Essentially, if the location of the habitat has been identified as important for nature conservation then it is said to be strategically significant.  Palmer Park does not fall into this category and therefore strategic significance is 'Low'.  Entering all of these data into the metric gives you a total unit score for the site.  This is summarised in the table below.
 
-```{r basline summary, echo=FALSE, message=FALSE, warning=FALSE}
+```{r basline summary, echo=FALSE, message=FALSE, warning=FALSE, results=TRUE}
+
+b <- baseline(m)
+
+knitr::kable(b, digits = 2)
 
 ```
 
 
-The baseline habitats generate n biodiversity units.
+The baseline habitats generate 0.82 biodiversity units.
 
 ## Retained habitats
 
-Now that the baseline is mapped, the habitats proposed by the development need to be mapped to carry out the net gain calculation.  For this I used a plan of the development as submitted with the application.  This is it.
+Now that the baseline is mapped, the habitats proposed by the development need to be mapped to carry out the net gain calculation.  For this I used a plan of the development as submitted with the application, from which I had previously digitised the red line boundary (see the map earlier).
+
+The differences are that some of the amenity grassland is lost to create a larger car park, but some different small areas are created in the new car park.  The woodland in the application boundary is also being removed as part of the development proposals.  Given the location, I am not sure that all that parking space is necessary - surely we should be encourage to walk, cycle or get the bus to the leisure centre!  Anyway, that is editorialising!  I was able to map the habitats and calculate the area of each habitat.  I assigned future condition appropriately and all of the other parameters remained the same.  A map of the proposed habitats is below.
+
+![Map of proposed habitats on site](/post/2021-01-18-palmer-park-bng.en_files/proposed_habitats_small.png)
+
+The proposed scheme generates n biodiversity units, as summarised in the table below.  This does not include the area of the land retained by the proposed development.
+
+```{r proposed summary, echo=FALSE, message=FALSE, warning=FALSE, results=TRUE}
+
+p <- proposed(m)
+
+knitr::kable(p, digits = 2, format.args = list(scientific = FALSE))
+
+```
+
+## Net change in biodiversity
+
+As can be seen from the next table, the scheme does not deliver a net gain in biodiversity.  There is a net loss of 0.38 units (or -47%).  As such the scheme does not accord with the NPPF or Local Plan policy EN12 and should be rejected.
+
+```{r results, echo = FALSE, results='asis', warning=FALSE, message=FALSE}
+
+results <- read.xlsx(m, sheet = 6, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %>% 
+  row_to_names(row_number = 1, remove_row = TRUE)
+
+knitr::kable(results)
+
+```
 
 
+## Delivering a net gain for biodiversity
 
-The differences are that some of the amenity grassland is lost to create a larger car park, but some different small areas are created in the new car park.  The woodladn in the application boundary is also beign removed as part of the development proposals.  Given the location, I am not sure that all that parking space is necessary - surely we should be encourage to walk, cycle or get the bus to the leisure centre!  Anyway, that is editorialising!  I was able to map the habitats and calculate the area of each habitat.  I assigned future condition appropriately adn all of the other parameters remained the same.  A map of the proposed habitats is below.
+It would be possible to deliver a net gain for biodiversity by enhancing an area of grassland within the park.  I have looked at how much land would be required and what the enhancement should be.  The metric is designed so that any losses are offset on a 'like-for-like' basis - in this case grassland has been lost, so grassland should be created or enhanced.  An area of amenity grassland in the wider park of n hectares could be enhanced and managed as wildflower grassland.  This grassland would generate sufficient biodiversity units to offset the impact of the development.  There was also a small area of woodland lost - the park is not the best place to create woodland, but another woodland (such as The Coal woodland) could be enhanced through planting and management to offset the woodland impacts.  All this would of course need to be agreed to by Reading Borough Council and a commitment to manage these enhancements for 30 years entered into.  The developer woudl need to fund that management, so this should be perfectly possible (although of course the developer is actually the Council!).
 
-[insert map]
+## Summary
 
-The proposed scheme generates n biodiversity units, as summariesed int he table below.
+In summary, both the National Planning Policy Framework and the Reading Local Plan support the delivery of biodiversity net gain for development.  The scheme for the leisure centre cannot demonstrate that it can deliver a biodiversity net gain and so should be refused until it can.
 
-[insert table]
+All of the data and a copy of the metric for this article can be found on [Github](https://github.com/drdcarpenter/palmer_park), so others are able to check what I have done and update or improve it.
 
-# Net change in biodiversity
+```{r session}
 
-As can be seen from the next table, the scheme does not deliver a net gain in biodiversity.  There is a net loss of n units (or -n%).  As such the scheme does not accord with the NPPF or Local Plan policy EN12 and should be rejected.
+sessionInfo()
 
-[insert table here]
-
-# Delivering a net gain  for biodiversity
-
-It would be possible to deliver a net gain for biodiversity by enhancing an area of grassland within the park.  I have looked at how much land would be required and what the enhancement should be.  The metric is designed so that any losses are offset
+```
 
