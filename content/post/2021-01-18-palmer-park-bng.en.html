@@ -21,7 +21,7 @@ DisableComments: no
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Palmer Park is in the Park ward of east Reading (UK). It has a leisure centre among its facilities and there is a planning proposal to extend this centre to create a swimming pool. East Reading used to have a swimming pool at Arthur Hill - a Victorian baths which Reading Borough Council sold and is now being turned into housing. The leisure centre extension is the Council’s proposal to provide a new swimming pool in east Reading, as well as other new facilities.</p>
-<p>This post details my assessment of the application and its ability to deliver a biodiversity net gain in accordance with the National Planning Policy Framework. It is also an opportunity to develop some R code to process the biodiversity metric which is key to calculating net gain.</p>
+<p>This post details my assessment of the application and its ability to deliver a biodiversity net gain in accordance with the National Planning Policy Framework. It is also an opportunity to develop some R code to process the biodiversity metric which is key to calculating net gain. I have included my code here should it help others. I intend to do further work on this code to create functions that produce the summary tables in this document and perhaps wrap it all into a package. In the meantime the code is here for anyone to use, as well as being on Github.</p>
 <p>I do this stuff in my day job, so I have a lot of experience in biodiversity net gain - it is in my job title. I also help teach other UK ecologists (and some from elsewhere in Europe) how to use the biodiversity metric for the Chartered Institute of Ecology and Environmental Management. However, what follows is merely my professional opinion and is not definitive.</p>
 <p>The application itself does not include an assessment of biodiversity net gain, despite biodiversity net gain being a requirement of both national and local planning policy, as I set out below. Why this is, I do not know.</p>
 </div>
@@ -63,7 +63,16 @@ DisableComments: no
 <h2>The metric</h2>
 <p>I have mentioned this a few times now, but ‘the metric’ is a spreadsheet based calculator for biodiversity net gain assessments. It was put together by Natural England staff and it is free to download from <a href="http://publications.naturalengland.org.uk/publication/5850908674228224">their website</a>. It is currently undergoing a revision, the new version due out in ‘Spring 20201’.</p>
 <p>Essentially, the metric works by calculating the difference between the habitats on a site before and after a development to see if there is a net gain. It is a little bit more complicated than that, but that is the basics. It does require a good habitats survey and an assessment of the habitats condition. It also really needs those habitats mapping in GIS or a CAD system to that the areas of the habitats can be accurately calculated.</p>
-<p>Here I will run through how I calculated the net change in biodiversity units from the information available on the Reading BC planning portal and some data I created using GIS. It is important to note that the data I am going to run through below is data I have created and may not be an accurate reflection of the exact scheme, but it is the best I can do with the information available.</p>
+<p>Here I will run through how I calculated the net change in biodiversity units from the information available on the Reading BC planning portal and some data I created using GIS. It is important to note that the data I am going to run through below is data I have created and may not be an accurate reflection of the exact scheme, but it is the best I can do with the information available. First load the packages and read in the metric data.</p>
+<pre class="r"><code>library(openxlsx)
+library(dplyr)
+library(janitor)
+library(readr)
+library(tibble)
+
+metric &lt;- &quot;Palmer Park Biodiversity Metric 2.0 Calculation Tool Beta Test - December 2019 Update.xlsm&quot;
+
+m &lt;- loadWorkbook(metric)</code></pre>
 </div>
 <div id="baseline-habitats" class="section level2">
 <h2>Baseline habitats</h2>
@@ -87,35 +96,50 @@ pdf_convert(pdf_file)</code></pre>
 <div id="entering-baseline-data-into-the-metric" class="section level2">
 <h2>Entering baseline data into the metric</h2>
 <p>I entered the habitat types and areas into the metric. It automatically applies a ‘distinctiveness’ score - this is a measure of a habitats importance for wildlife. I entered a condition score, following the guidance in the technical document that accompanies the metric. Connectivity scores are a function of distinctiveness - if distinctiveness is ‘Low’ or ‘Medium’ connectivity is ‘Low’. If distinctiveness is ‘High’ or ‘Very High’ then connectivity is ‘Medium’. This rule is set out in the user guide. Strategic significance relates to the importance of a habitat in a particular location. I wrote a little bit about this on <a href="https://www.linkedin.com/pulse/strategic-significance-biodiversity-net-gain-dan-carpenter-cenv/">LinkedIn</a>. Essentially, if the location of the habitat has been identified as important for nature conservation then it is said to be strategically significant. Palmer Park does not fall into this category and therefore strategic significance is ‘Low’. Entering all of these data into the metric gives you a total unit score for the site. This is summarised in the table below.</p>
+<pre class="r"><code>baseline &lt;- function(metric){
+  
+  b &lt;- read.xlsx(metric, sheet = 9, startRow = 4, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %&gt;% 
+    select(3:5, 7, 9, 13, 16) %&gt;% 
+    remove_empty(which = c(&quot;rows&quot;, &quot;cols&quot;)) %&gt;% 
+    row_to_names(row_number = 2, remove_row = TRUE) %&gt;% 
+    rename(Habitat = 1, Area = 2, Connectivity = 5, `Biodiversity units` = 7) %&gt;% 
+    slice(1:4)
+  
+  b$Area &lt;-  as.numeric(as.character(b$Area))
+  b$`Biodiversity units` &lt;- as.numeric(as.character(b$`Biodiversity units`))
+  
+  b &lt;- adorn_totals(b)
+  
+  return(b)
+  
+}
+
+b &lt;- baseline(m)
+
+knitr::kable(b, digits = 2)</code></pre>
 <table>
 <colgroup>
-<col width="2%" />
-<col width="10%" />
-<col width="26%" />
+<col width="35%" />
+<col width="3%" />
+<col width="11%" />
 <col width="8%" />
-<col width="8%" />
-<col width="6%" />
-<col width="12%" />
-<col width="14%" />
-<col width="10%" />
+<col width="9%" />
+<col width="19%" />
+<col width="13%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left"></th>
-<th align="left">Broad Habitat</th>
-<th align="left">Habitat type</th>
-<th align="right">Area (hectares)</th>
+<th align="left">Habitat</th>
+<th align="right">Area</th>
 <th align="left">Distinctiveness</th>
 <th align="left">Condition</th>
-<th align="left">Ecological connectivity</th>
+<th align="left">Connectivity</th>
 <th align="left">Strategic significance</th>
-<th align="right">Total habitat units</th>
+<th align="right">Biodiversity units</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">3</td>
-<td align="left">Urban</td>
 <td align="left">Urban - Amenity grassland</td>
 <td align="right">0.38</td>
 <td align="left">Low</td>
@@ -125,8 +149,6 @@ pdf_convert(pdf_file)</code></pre>
 <td align="right">0.76</td>
 </tr>
 <tr class="even">
-<td align="left">4</td>
-<td align="left">Urban</td>
 <td align="left">Urban - Introduced shrub</td>
 <td align="right">0.01</td>
 <td align="left">Low</td>
@@ -136,8 +158,6 @@ pdf_convert(pdf_file)</code></pre>
 <td align="right">0.02</td>
 </tr>
 <tr class="odd">
-<td align="left">5</td>
-<td align="left">Urban</td>
 <td align="left">Urban - Developed land; sealed surface</td>
 <td align="right">0.91</td>
 <td align="left">V.Low</td>
@@ -147,8 +167,6 @@ pdf_convert(pdf_file)</code></pre>
 <td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="left">6</td>
-<td align="left">Woodland and forest</td>
 <td align="left">Woodland and forest - Other woodland; broadleaved</td>
 <td align="right">0.01</td>
 <td align="left">Medium</td>
@@ -158,14 +176,12 @@ pdf_convert(pdf_file)</code></pre>
 <td align="right">0.04</td>
 </tr>
 <tr class="odd">
-<td align="left">251</td>
-<td align="left">NA</td>
-<td align="left">Total site area ha</td>
+<td align="left">Total</td>
 <td align="right">1.31</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
 <td align="right">0.82</td>
 </tr>
 </tbody>
@@ -180,55 +196,123 @@ pdf_convert(pdf_file)</code></pre>
 <img src="/post/2021-01-18-palmer-park-bng.en_files/proposed_habitats_small.png" alt="" />
 <p class="caption">Map of proposed habitats on site</p>
 </div>
-<p>The proposed scheme generates n biodiversity units, as summarised in the table below. This does not include the area of the land retained by the proposed development.</p>
+<p>The proposed scheme generates 0.44 biodiversity units, as summarised in the table below. This does not include the area of the land retained by the proposed development.</p>
+<pre class="r"><code># create summary table of proposed units
+# this only does the created habitats, not the retained or enhanced habitats
+
+proposed &lt;- function(metric){
+  
+  p &lt;- read.xlsx(metric, sheet = 10, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %&gt;% 
+    select(1:3, 5, 7, 11, 17) %&gt;% 
+    remove_empty(which = c(&quot;rows&quot;, &quot;cols&quot;)) %&gt;% 
+    row_to_names(row_number = 4, remove_row = TRUE) %&gt;% 
+    rename(Habitat = 1, Area = 2, Connectivity = 5, `Strategic significance` = 6, `Biodiversity units` = 7) %&gt;% 
+    slice(2:3)
+  
+  p$Area &lt;- as.numeric(as.character(p$Area))
+  p$`Biodiversity units` &lt;- as.numeric(as.character(p$`Biodiversity units`))
+  
+  return(p)
+  
+}
+
+p &lt;- proposed(m)
+
+# retained habitats
+
+r &lt;- read.xlsx(m, sheet = 9, startRow = 4, skipEmptyRows = TRUE, skipEmptyCols = TRUE)
+retained &lt;- r %&gt;% 
+  select(3,17,5,7,10,13,20) %&gt;% 
+  slice(2:5) %&gt;% 
+  row_to_names(row_number = 1, remove_row = TRUE) %&gt;% 
+  rename(Habitat = 1, Area = 2, Connectivity = 5, `Biodiversity units` = 7)
+
+retained$Area &lt;- as.numeric(as.character(retained$Area))
+retained$`Biodiversity units` &lt;- as.numeric(as.character(retained$`Biodiversity units`))
+
+# proposed units table
+
+proposed &lt;- bind_rows(retained, p) %&gt;% 
+  slice(-6) %&gt;% 
+  adorn_totals()
+
+
+knitr::kable(proposed, digits = 2, format.args = list(scientific = FALSE))</code></pre>
 <table>
 <colgroup>
-<col width="24%" />
-<col width="10%" />
-<col width="10%" />
-<col width="7%" />
-<col width="15%" />
-<col width="17%" />
-<col width="15%" />
+<col width="26%" />
+<col width="3%" />
+<col width="11%" />
+<col width="8%" />
+<col width="18%" />
+<col width="18%" />
+<col width="13%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left">Proposed habitat</th>
-<th align="right">Area (hectares)</th>
+<th align="left">Habitat</th>
+<th align="right">Area</th>
 <th align="left">Distinctiveness</th>
 <th align="left">Condition</th>
-<th align="left">Ecological connectivity</th>
-<th align="left">Strategic Significance</th>
-<th align="right">Habitat units delivered</th>
+<th align="left">Connectivity</th>
+<th align="left">Strategic significance</th>
+<th align="right">Biodiversity units</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td align="left">Urban - Amenity grassland</td>
+<td align="right">0.16</td>
+<td align="left">Low</td>
+<td align="left">Poor</td>
+<td align="left">Unconnected habitat</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.32</td>
+</tr>
+<tr class="even">
+<td align="left">Urban - Introduced shrub</td>
+<td align="right">0.01</td>
+<td align="left">Low</td>
+<td align="left">Poor</td>
+<td align="left">Unconnected habitat</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.02</td>
+</tr>
+<tr class="odd">
+<td align="left">Urban - Developed land; sealed surface</td>
+<td align="right">0.91</td>
+<td align="left">V.Low</td>
+<td align="left">N/A - Other</td>
+<td align="left">Assessment not appropriate</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
 <td align="left">Urban - Amenity grassland</td>
 <td align="right">0.05</td>
 <td align="left">Low</td>
 <td align="left">Poor</td>
 <td align="left">Low</td>
 <td align="left">Low Strategic Significance</td>
-<td align="right">0.1</td>
+<td align="right">0.10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Urban - Developed land; sealed surface</td>
 <td align="right">0.18</td>
 <td align="left">V.Low</td>
 <td align="left">N/A - Other</td>
 <td align="left">N/A</td>
 <td align="left">Low Strategic Significance</td>
-<td align="right">0.0</td>
+<td align="right">0.00</td>
 </tr>
-<tr class="odd">
-<td align="left">Totals</td>
-<td align="right">0.23</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="left">NA</td>
-<td align="right">0.1</td>
+<tr class="even">
+<td align="left">Total</td>
+<td align="right">1.31</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="right">0.44</td>
 </tr>
 </tbody>
 </table>
@@ -236,42 +320,46 @@ pdf_convert(pdf_file)</code></pre>
 <div id="net-change-in-biodiversity" class="section level2">
 <h2>Net change in biodiversity</h2>
 <p>As can be seen from the next table, the scheme does not deliver a net gain in biodiversity. There is a net loss of 0.38 units (or -47%). As such the scheme does not accord with the NPPF or Local Plan policy EN12 and should be rejected.</p>
+<pre class="r"><code># results table
+results &lt;- read.xlsx(m, sheet = 6, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %&gt;%
+  row_to_names(row_number = 1, remove_row = TRUE) %&gt;% 
+  clean_names() %&gt;% 
+  rename(`Headline Results` = headline_results,&quot; &quot; = na, Units = na_2) %&gt;% 
+  remove_rownames()
+
+options(knitr.kable.NA = &quot;&quot;)
+
+knitr::kable(results, digits = 2, format.args = list(scientific = FALSE, na.encode = TRUE))</code></pre>
 <table>
 <colgroup>
-<col width="2%" />
-<col width="76%" />
-<col width="12%" />
-<col width="9%" />
+<col width="81%" />
+<col width="13%" />
+<col width="5%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left"></th>
 <th align="left">Headline Results</th>
-<th align="left">NA</th>
-<th align="right">NA</th>
+<th align="left"></th>
+<th align="right">Units</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">2</td>
 <td align="left">On-site baseline</td>
 <td align="left">Habitat units</td>
-<td align="right">0.8200000</td>
+<td align="right">0.82</td>
 </tr>
 <tr class="even">
-<td align="left">3</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">Hedgerow units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="odd">
-<td align="left">4</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">River units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="left">5</td>
 <td align="left">On-site post-intervention</td>
 <td align="left"></td>
 <td align="right"></td>
@@ -279,41 +367,34 @@ pdf_convert(pdf_file)</code></pre>
 <tr class="odd">
 <td align="left">(Including habitat retention, creation, enhancement &amp; succession)</td>
 <td align="left">Habitat units</td>
-<td align="left">0.4365000</td>
-<td align="right"></td>
+<td align="right">0.44</td>
 </tr>
 <tr class="even">
-<td align="left">6</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">Hedgerow units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="odd">
-<td align="left">7</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">River units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="left">8</td>
 <td align="left">Off-site baseline</td>
 <td align="left">Habitat units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="odd">
-<td align="left">9</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">Hedgerow units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="left">10</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">River units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="odd">
-<td align="left">11</td>
 <td align="left">Off-site post-intervention</td>
 <td align="left"></td>
 <td align="right"></td>
@@ -321,23 +402,19 @@ pdf_convert(pdf_file)</code></pre>
 <tr class="even">
 <td align="left">(Including habitat retention, creation, enhancement &amp; succession)</td>
 <td align="left">Habitat units</td>
-<td align="left">0.0000000</td>
-<td align="right"></td>
+<td align="right">0.00</td>
 </tr>
 <tr class="odd">
-<td align="left">12</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">Hedgerow units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="left">13</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">River units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="odd">
-<td align="left">14</td>
 <td align="left">Total net unit change</td>
 <td align="left"></td>
 <td align="right"></td>
@@ -345,23 +422,19 @@ pdf_convert(pdf_file)</code></pre>
 <tr class="even">
 <td align="left">(including all on-site &amp; off-site habitat retention/creation)</td>
 <td align="left">Habitat units</td>
-<td align="left">-0.3835000</td>
-<td align="right"></td>
+<td align="right">-0.38</td>
 </tr>
 <tr class="odd">
-<td align="left">15</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">Hedgerow units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="left">16</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">River units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="odd">
-<td align="left">17</td>
 <td align="left">Total net % change</td>
 <td align="left"></td>
 <td align="right"></td>
@@ -369,20 +442,17 @@ pdf_convert(pdf_file)</code></pre>
 <tr class="even">
 <td align="left">(including all on-site &amp; off-site habitat creation + retained habitats)</td>
 <td align="left">Habitat units</td>
-<td align="left">-0.4676829</td>
-<td align="right"></td>
+<td align="right">-0.47</td>
 </tr>
 <tr class="odd">
-<td align="left">18</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">Hedgerow units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="left">19</td>
-<td align="left">NA</td>
+<td align="left"></td>
 <td align="left">River units</td>
-<td align="right">0.0000000</td>
+<td align="right">0.00</td>
 </tr>
 </tbody>
 </table>
@@ -416,16 +486,15 @@ pdf_convert(pdf_file)</code></pre>
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] readr_1.3.1    janitor_2.0.1  dplyr_1.0.2    openxlsx_4.2.3
+## [1] tibble_3.0.4   readr_1.3.1    janitor_2.0.1  dplyr_1.0.2    openxlsx_4.2.3
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_1.0.5       knitr_1.30       magrittr_2.0.1   hms_0.5.3       
 ##  [5] tidyselect_1.1.0 R6_2.4.1         rlang_0.4.9      highr_0.8       
 ##  [9] stringr_1.4.0    tools_3.6.3      xfun_0.19        htmltools_0.5.0 
-## [13] ellipsis_0.3.1   yaml_2.2.1       digest_0.6.27    tibble_3.0.4    
-## [17] lifecycle_0.2.0  crayon_1.3.4     bookdown_0.20    zip_2.1.1       
-## [21] purrr_0.3.4      vctrs_0.3.6      snakecase_0.11.0 glue_1.4.2      
-## [25] evaluate_0.14    rmarkdown_2.5    blogdown_0.20    stringi_1.4.6   
-## [29] compiler_3.6.3   pillar_1.4.7     generics_0.0.2   lubridate_1.7.9 
-## [33] pkgconfig_2.0.3</code></pre>
+## [13] ellipsis_0.3.1   yaml_2.2.1       digest_0.6.27    lifecycle_0.2.0 
+## [17] crayon_1.3.4     bookdown_0.20    zip_2.1.1        purrr_0.3.4     
+## [21] vctrs_0.3.6      snakecase_0.11.0 glue_1.4.2       evaluate_0.14   
+## [25] rmarkdown_2.5    blogdown_0.20    stringi_1.4.6    compiler_3.6.3  
+## [29] pillar_1.4.7     generics_0.0.2   lubridate_1.7.9  pkgconfig_2.0.3</code></pre>
 </div>

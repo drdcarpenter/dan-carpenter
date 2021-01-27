@@ -14,49 +14,16 @@ Categories: [R, QGIS, habitats, biodiversity]
 DisableComments: no
 ---
 
-```{r set up, echo=FALSE, message=FALSE, warning=FALSE}
-
+```{r set up, echo = FALSE, message=FALSE, warning=FALSE}
 library(openxlsx)
 library(dplyr)
 library(janitor)
 library(readr)
+library(tibble)
 
 metric <- "/home/danc/Documents/palmer_park/Palmer Park Biodiversity Metric 2.0 Calculation Tool Beta Test - December 2019 Update.xlsm"
 
 m <- loadWorkbook(metric)
-
-baseline <- function(metric){
-  
-  b <- read.xlsx(metric, sheet = 9, startRow = 4, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %>% 
-    select(2:5, 7, 9, 13, 16) %>% 
-    remove_empty(which = c("rows", "cols")) %>% 
-    row_to_names(row_number = 2, remove_row = TRUE)
-  
-  b$`Area (hectares)` <-  as.numeric(as.character(b$`Area (hectares)`))
-  b$`Total habitat units` <- as.numeric(as.character(b$`Total habitat units`))
-  
-  return(b)
-  
-}
-
-#baseline(m)
-
-proposed <- function(metric){
-  
-  p <- read.xlsx(metric, sheet = 10, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %>% 
-    select(1:3, 5, 7, 11, 17) %>% 
-    remove_empty(which = c("rows", "cols")) %>% 
-    row_to_names(row_number = 4, remove_row = TRUE) %>% 
-    rename(`Strategic Significance` = 6) %>% 
-    slice(-1)
-  
-  p$`Area (hectares)` <- as.numeric(as.character(p$`Area (hectares)`))
-  p$`Habitat units delivered` <- as.numeric(as.character(p$`Habitat units delivered`))
-  
-  return(p)
-  
-}
-
 ```
 
 
@@ -64,7 +31,7 @@ proposed <- function(metric){
 
 Palmer Park is in the Park ward of east Reading (UK).  It has a leisure centre among its facilities and there is a planning proposal to extend this centre to create a swimming pool.  East Reading used to have a swimming pool at Arthur Hill - a Victorian baths which Reading Borough Council sold and is now being turned into housing.  The leisure centre extension is the Council's proposal to provide a new swimming pool in east Reading, as well as other new facilities.
 
-This post details my assessment of the application and its ability to deliver a biodiversity net gain in accordance with the National Planning Policy Framework.  It is also an opportunity to develop some R code to process the biodiversity metric which is key to calculating net gain.
+This post details my assessment of the application and its ability to deliver a biodiversity net gain in accordance with the National Planning Policy Framework.  It is also an opportunity to develop some R code to process the biodiversity metric which is key to calculating net gain.  I have included my code here should it help others.  I intend to do further work on this code to create functions that produce the summary tables in this document and perhaps wrap it all into a package.  In the meantime the code is here for anyone to use, as well as being on Github.
 
 I do this stuff in my day job, so I have a lot of experience in biodiversity net gain - it is in my job title.  I also help teach other UK ecologists (and some from elsewhere in Europe) how to use the biodiversity metric for the Chartered Institute of Ecology and Environmental Management.  However, what follows is merely my professional opinion and is not definitive.
 
@@ -105,7 +72,21 @@ I have mentioned this a few times now, but 'the metric' is a spreadsheet based c
 
 Essentially, the metric works by calculating the difference between the habitats on a site before and after a development to see if there is a net gain.  It is a little bit more complicated than that, but that is the basics.  It does require a good habitats survey and an assessment of the habitats condition.  It also really needs those habitats mapping in GIS or a CAD system to that the areas of the habitats can be accurately calculated.
 
-Here I will run through how I calculated the net change in biodiversity units from the information available on the Reading BC planning portal and some data I created using GIS.  It is important to note that the data I am going to run through below is data I have created and may not be an accurate reflection of the exact scheme, but it is the best I can do with the information available.
+Here I will run through how I calculated the net change in biodiversity units from the information available on the Reading BC planning portal and some data I created using GIS.  It is important to note that the data I am going to run through below is data I have created and may not be an accurate reflection of the exact scheme, but it is the best I can do with the information available.  First load the packages and read in the metric data.
+
+```{r read data, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE}
+
+library(openxlsx)
+library(dplyr)
+library(janitor)
+library(readr)
+library(tibble)
+
+metric <- "Palmer Park Biodiversity Metric 2.0 Calculation Tool Beta Test - December 2019 Update.xlsm"
+
+m <- loadWorkbook(metric)
+
+```
 
 ## Baseline habitats
 
@@ -132,7 +113,25 @@ I now had the different habitat parcels mapped and areas for each of them calcul
 
 I entered the habitat types and areas into the metric.  It automatically applies a 'distinctiveness' score - this is a measure of a habitats importance for wildlife.  I entered a condition score, following the guidance in the technical document that accompanies the metric.  Connectivity scores are a function of distinctiveness - if distinctiveness is 'Low' or 'Medium' connectivity is 'Low'.  If distinctiveness is 'High' or 'Very High' then connectivity is 'Medium'.  This rule is set out in the user guide.  Strategic significance relates to the importance of a habitat in a particular location.  I wrote a little bit about this on [LinkedIn](https://www.linkedin.com/pulse/strategic-significance-biodiversity-net-gain-dan-carpenter-cenv/).  Essentially, if the location of the habitat has been identified as important for nature conservation then it is said to be strategically significant.  Palmer Park does not fall into this category and therefore strategic significance is 'Low'.  Entering all of these data into the metric gives you a total unit score for the site.  This is summarised in the table below.
 
-```{r basline summary, echo=FALSE, message=FALSE, warning=FALSE, results=TRUE}
+```{r basline summary, echo=TRUE, message=FALSE, warning=FALSE, results=TRUE}
+
+baseline <- function(metric){
+  
+  b <- read.xlsx(metric, sheet = 9, startRow = 4, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %>% 
+    select(3:5, 7, 9, 13, 16) %>% 
+    remove_empty(which = c("rows", "cols")) %>% 
+    row_to_names(row_number = 2, remove_row = TRUE) %>% 
+    rename(Habitat = 1, Area = 2, Connectivity = 5, `Biodiversity units` = 7) %>% 
+    slice(1:4)
+  
+  b$Area <-  as.numeric(as.character(b$Area))
+  b$`Biodiversity units` <- as.numeric(as.character(b$`Biodiversity units`))
+  
+  b <- adorn_totals(b)
+  
+  return(b)
+  
+}
 
 b <- baseline(m)
 
@@ -151,13 +150,51 @@ The differences are that some of the amenity grassland is lost to create a large
 
 ![Map of proposed habitats on site](/post/2021-01-18-palmer-park-bng.en_files/proposed_habitats_small.png)
 
-The proposed scheme generates n biodiversity units, as summarised in the table below.  This does not include the area of the land retained by the proposed development.
+The proposed scheme generates 0.44 biodiversity units, as summarised in the table below.  This does not include the area of the land retained by the proposed development.
 
-```{r proposed summary, echo=FALSE, message=FALSE, warning=FALSE, results=TRUE}
+```{r proposed summary, echo=TRUE, message=FALSE, warning=FALSE, results=TRUE}
+
+# create summary table of proposed units
+# this only does the created habitats, not the retained or enhanced habitats
+
+proposed <- function(metric){
+  
+  p <- read.xlsx(metric, sheet = 10, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %>% 
+    select(1:3, 5, 7, 11, 17) %>% 
+    remove_empty(which = c("rows", "cols")) %>% 
+    row_to_names(row_number = 4, remove_row = TRUE) %>% 
+    rename(Habitat = 1, Area = 2, Connectivity = 5, `Strategic significance` = 6, `Biodiversity units` = 7) %>% 
+    slice(2:3)
+  
+  p$Area <- as.numeric(as.character(p$Area))
+  p$`Biodiversity units` <- as.numeric(as.character(p$`Biodiversity units`))
+  
+  return(p)
+  
+}
 
 p <- proposed(m)
 
-knitr::kable(p, digits = 2, format.args = list(scientific = FALSE))
+# retained habitats
+
+r <- read.xlsx(m, sheet = 9, startRow = 4, skipEmptyRows = TRUE, skipEmptyCols = TRUE)
+retained <- r %>% 
+  select(3,17,5,7,10,13,20) %>% 
+  slice(2:5) %>% 
+  row_to_names(row_number = 1, remove_row = TRUE) %>% 
+  rename(Habitat = 1, Area = 2, Connectivity = 5, `Biodiversity units` = 7)
+
+retained$Area <- as.numeric(as.character(retained$Area))
+retained$`Biodiversity units` <- as.numeric(as.character(retained$`Biodiversity units`))
+
+# proposed units table
+
+proposed <- bind_rows(retained, p) %>% 
+  slice(-6) %>% 
+  adorn_totals()
+
+
+knitr::kable(proposed, digits = 2, format.args = list(scientific = FALSE))
 
 ```
 
@@ -165,12 +202,18 @@ knitr::kable(p, digits = 2, format.args = list(scientific = FALSE))
 
 As can be seen from the next table, the scheme does not deliver a net gain in biodiversity.  There is a net loss of 0.38 units (or -47%).  As such the scheme does not accord with the NPPF or Local Plan policy EN12 and should be rejected.
 
-```{r results, echo = FALSE, results='asis', warning=FALSE, message=FALSE}
+```{r results, echo = TRUE, results='asis', warning=FALSE, message=FALSE}
 
-results <- read.xlsx(m, sheet = 6, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %>% 
-  row_to_names(row_number = 1, remove_row = TRUE)
+# results table
+results <- read.xlsx(m, sheet = 6, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %>%
+  row_to_names(row_number = 1, remove_row = TRUE) %>% 
+  clean_names() %>% 
+  rename(`Headline Results` = headline_results," " = na, Units = na_2) %>% 
+  remove_rownames()
 
-knitr::kable(results)
+options(knitr.kable.NA = "")
+
+knitr::kable(results, digits = 2, format.args = list(scientific = FALSE, na.encode = TRUE))
 
 ```
 
