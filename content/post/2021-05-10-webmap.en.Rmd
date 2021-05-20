@@ -1,0 +1,94 @@
+---
+title: Deploying a Leaflet webmap on DigitalOcean
+author: Dan Carpenter
+date: '2021-05-20'
+slug: webmap
+categories:
+  - DigitalOcean
+  - apps
+  - maps
+tags:
+  - apps
+  - R
+  - maps
+  - DigitalOcean
+Description: 'Creating and deploying a Leaflet webmap'
+Tags: []
+Categories: []
+DisableComments: no
+---
+
+## Creating and deploying webmaps using DigitalOcean
+Deploying things can seem quite hard.  You made something cool and it runs nicely on your own computer, but what you really want to do is share it with the world.  Websites, Shiny apps, webmaps etc:  all of them seem to come with a complicated set of instructions to actually get them on the web.  Building this website in R using the blogdown package was good fun, but making it available to the world via Netlify wasn't exactly straight forward.
+
+This is why I love the DigitalOcean app platform.  They don't pay me, in any way shape or form, so this is just my opinion as a user.  And I don't do anything special with their cloud services, but when I want to get something on the web, they make it easy.
+
+Here I am going to show you how I made a simple webmap in R and then deployed it on the web using the DO app platform.
+
+## Webmaps in R
+I like webmaps.  They are great for letting people explore data and the world.  A client wanted me to make a webmap for a project - at work we have the ESRI platform where that is relatively straight forward, notwithstanding the eye watering price tag for a licence.  This is well beyond small organisations or individuals.  So I wanted to see if I could get a webmap made in R up on the web and just send them a URL.
+
+Making a webmap in R is pretty straight forward, thanks to the [leaflet](https://rstudio.github.io/leaflet/) package and some companion packages, such as leaflet.esri.  The latter lets you use data served out of arcgis data hubs, which are very much in favour with UK government departments.  I am going to show you how to make a webmap using those two packages.
+
+First load the relevant libraries:
+```{r load libraries}
+library(leaflet)
+library(leaflet.esri)
+# we will also need another package later, so load that now as well
+library(htmlwidgets)
+```
+
+Next we can start to build the app.  The first bit is easy and this will give you a functioning webmap, but without any data on it:
+```{r simple webmap}
+m <- leaflet() %>% 
+  addTiles()
+
+m
+```
+
+Next I wanted to add some data from the Natural England data portal.  We need to navigate to the [SSSI page](https://naturalengland-defra.opendata.arcgis.com/datasets/sites-of-special-scientific-interest-england) and copy down the URL of the GeoService from the APIs menu.  We can provide the url in the addEsriFeatureLayer() function:
+```{r add ESRI layer}
+m <- leaflet() %>% 
+  addTiles(group = "Basemap") %>% 
+  setView(-1.2576985, 51.751975, 11) %>% 
+  addEsriFeatureLayer(url = "https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/SSSI_England/FeatureServer/0",
+                      popupProperty = "SSSI_NAME",
+                      group = "SSSI")
+m
+```
+popupProperty is to set what is displayed when you click on a feature.  I have also set the view and zoom to Oxford, just so you don't see the whole world!
+
+Well, that covers the basics.  Obviously there is a great deal more that you can do in Leaflet, including adding layer controls, search bars for layers, add more layers including those from local file data via the [sf](https://r-spatial.github.io/sf/) package.  But I will leave it at that for now.  The next stage is turn it into something you can deploy.
+
+For this I used the [htmlwidgets](https://www.htmlwidgets.org/) package.  There is a function called saveWidgets which turns your Leaflet map object ('m' in this case) into an html file.
+```{r save as widget, eval=FALSE}
+saveWidget(m, file = "index.html")
+```
+You need to call this file index.html, otherwise it will not deploy to DigitalOcean.  So that is that really.  You should now have a html file in your directory which if you open locally in a browser will be the webmap you just created above.
+
+## Push to Github
+We now need to push all of our code into a Github repository. I won’t cover the details of that here, but there is [an excellent guide](https://happygitwithr.com/) if this is not something you are familiar with. Assuming you have git installed and talking to Github (no easy task), the initialise git (git init), commit (git commit -a -m first commit), add a remote repository on Github (git remote add origin https://github.com/username/repository) and push your code to the repository.
+
+If all is well you will find your code in your repository. This is very much a cursory glance at adding code to a Github repository, so do not rely on it! I am assuming you already know how to do all this!
+
+## Deploying your webmap
+For this you do need a DigitalOcean account.  It is free to set one up and if you use [this referral link](https://m.do.co/c/1c82d179ee2d), we both get some free cerdit to play with.  Once you have set up an account and gone through the verification steps, click on the apps menu item in the lefthand menu adn the click on 'Create app'.  You will then be asked to select the source for your code, with a choice of Github, GitLab of DockerHub.  There is a verification step if this is the first tiem you are connecting GitHub Oor another git repository) to your DO account, so go ahead and do that.  Once you are have connected your GitHub to DO you then select your repository and branch (in my case there is only one branch) and DO will fetch and analyse that code.  The other great thing, if you click autodeploy, every time you push a change in code to your repository, your app is automatically updated!  Brilliant.
+
+DO will then ask you what type of app this is and how big you want your server to be.  Pick 'Static' site and the smallest free tier server on offer.  DO app platform will provide you with three free static sites, so plenty to play with.  The static site option is looking for the index.html file in your repository and it fails if you give it a different name (like map.html, which is what I did first).  Once you have selected all of the boxes, click deploy app and DO will build you app for you.  Once it is finished DO will provide you with a URL where you can now see your webmap.  You can provide a domain name for this if you want to.
+
+What I think is going on under the hood of the app platform is DO builds a Docker container for your app, so when you click on the URL it spins up a container with your app.  Kubernertes is also invovled somehow, but I don't understand that!  And to be honest I dont need to.  With the app platform I can build something in R and then get it online in just a few clicks.  DigitalOcean have their own [excellent guide](https://www.digitalocean.com/blog/introducing-digitalocean-app-platform-reimagining-paas-to-make-it-simpler-for-you-to-build-deploy-and-scale-apps/) to using the app platform, which is much more detailed than my description above.
+
+You can see my webmap here: [https://webmap-test-x9bkj.ondigitalocean.app/](https://webmap-test-x9bkj.ondigitalocean.app/)
+
+All my code is on Github here: [https://github.com/drdcarpenter/webmap-test](https://github.com/drdcarpenter/webmap-test)
+
+## Summary
+This has been a brief guide to creating a webmap in R and deploying it to the DigitalOCean app platform.  I hope it is useful and provides a bit of guidance on getting web-based projects on line.  You can read my other post about deploying Shiny apps to the app platform [here](https://dan-carpenter.co.uk/2020/11/09/shiny-apps-on-digital-ocean/).
+
+In the meantime, happy coding and deploying!
+
+## Session info
+```{r Session info}
+sessionInfo()
+```
+
