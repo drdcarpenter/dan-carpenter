@@ -10,7 +10,7 @@ title: CV
 
 **Professional History**
 
-Principal Consultant (Biodiversity Net Gain), Ethos Environmental Planning, Bath, 
+Associate Director (Biodiversity Net Gain), Ethos Environmental Planning, Bath, 
 September 2020 – present
 * I am the company lead for biodiversity net gain and wider environmental net gain.  This includes working with developers to maximise biodiversity net gain for their projects, as well as working with landowners and land managers to deliver biodiversity enhancement so on their land.
 
