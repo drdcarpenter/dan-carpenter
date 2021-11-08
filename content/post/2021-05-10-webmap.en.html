@@ -18,8 +18,6 @@ Categories: []
 DisableComments: no
 ---
 
-<link href="/rmarkdown-libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
-<script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
 <script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
 <script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
 <link href="/rmarkdown-libs/leaflet/leaflet.css" rel="stylesheet" />
@@ -69,9 +67,9 @@ m</code></pre>
                       popupProperty = &quot;SSSI_NAME&quot;,
                       group = &quot;SSSI&quot;)
 m</code></pre>
-<p><div id="htmlwidget-2" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<div id="htmlwidget-2" style="width:672px;height:480px;" class="leaflet html-widget"></div>
 <script type="application/json" data-for="htmlwidget-2">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"Basemap",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addEsriFeatureLayer","args":["https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/SSSI_England/FeatureServer/0",{},null,"SSSI",null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},"SSSI_NAME",{"maxWidth":300,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"className":""},{"interactive":true,"className":"","stroke":true,"color":"#03F","weight":5,"opacity":0.5,"fill":true,"fillColor":"#03F","fillOpacity":0.2,"dashArray":null,"smoothFactor":1,"noClip":false},null,false]}],"setView":[[51.751975,-1.2576985],11,[]]},"evals":[],"jsHooks":[]}</script>
-popupProperty is to set what is displayed when you click on a feature. I have also set the view and zoom to Oxford, just so you don’t see the whole world!</p>
+<p>popupProperty is to set what is displayed when you click on a feature. I have also set the view and zoom to Oxford, just so you don’t see the whole world!</p>
 <p>Well, that covers the basics. Obviously there is a great deal more that you can do in Leaflet, including adding layer controls, search bars for layers, add more layers including those from local file data via the <a href="https://r-spatial.github.io/sf/">sf</a> package. But I will leave it at that for now. The next stage is turn it into something you can deploy.</p>
 <p>For this I used the <a href="https://www.htmlwidgets.org/">htmlwidgets</a> package. There is a function called saveWidgets which turns your Leaflet map object (‘m’ in this case) into an html file.</p>
 <pre class="r"><code>saveWidget(m, file = &quot;index.html&quot;)</code></pre>
@@ -84,7 +82,7 @@ popupProperty is to set what is displayed when you click on a feature. I have al
 </div>
 <div id="deploying-your-webmap" class="section level2">
 <h2>Deploying your webmap</h2>
-<p>For this you do need a DigitalOcean account. It is free to set one up and if you use <a href="https://m.do.co/c/1c82d179ee2d">this referral link</a>, we both get some free cerdit to play with. Once you have set up an account and gone through the verification steps, click on the apps menu item in the lefthand menu adn the click on ‘Create app’. You will then be asked to select the source for your code, with a choice of Github, GitLab of DockerHub. There is a verification step if this is the first tiem you are connecting GitHub Oor another git repository) to your DO account, so go ahead and do that. Once you are have connected your GitHub to DO you then select your repository and branch (in my case there is only one branch) and DO will fetch and analyse that code. The other great thing, if you click autodeploy, every time you push a change in code to your repository, your app is automatically updated! Brilliant.</p>
+<p>For this you do need a DigitalOcean account. It is free to set one up and if you use <a href="https://m.do.co/c/1c82d179ee2d">this referral link</a>, we both get some free credit to play with. Once you have set up an account and gone through the verification steps, click on the apps menu item in the lefthand menu adn the click on ‘Create app’. You will then be asked to select the source for your code, with a choice of Github, GitLab of DockerHub. There is a verification step if this is the first time you are connecting GitHub (or another git repository) to your DO account, so go ahead and do that. Once you are have connected your GitHub to DO you then select your repository and branch (in my case there is only one branch) and DO will fetch and analyse that code. The other great thing, if you click autodeploy, every time you push a change in code to your repository, your app is automatically updated! Brilliant.</p>
 <p>DO will then ask you what type of app this is and how big you want your server to be. Pick ‘Static’ site and the smallest free tier server on offer. DO app platform will provide you with three free static sites, so plenty to play with. The static site option is looking for the index.html file in your repository and it fails if you give it a different name (like map.html, which is what I did first). Once you have selected all of the boxes, click deploy app and DO will build you app for you. Once it is finished DO will provide you with a URL where you can now see your webmap. You can provide a domain name for this if you want to.</p>
 <p>What I think is going on under the hood of the app platform is DO builds a Docker container for your app, so when you click on the URL it spins up a container with your app. Kubernertes is also invovled somehow, but I don’t understand that! And to be honest I dont need to. With the app platform I can build something in R and then get it online in just a few clicks. DigitalOcean have their own <a href="https://www.digitalocean.com/blog/introducing-digitalocean-app-platform-reimagining-paas-to-make-it-simpler-for-you-to-build-deploy-and-scale-apps/">excellent guide</a> to using the app platform, which is much more detailed than my description above.</p>
 <p>You can see my webmap here: <a href="https://webmap-test-x9bkj.ondigitalocean.app/">https://webmap-test-x9bkj.ondigitalocean.app/</a></p>
@@ -100,7 +98,7 @@ popupProperty is to set what is displayed when you click on a feature. I have al
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 3.6.3 (2020-02-29)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Ubuntu 20.04.2 LTS
+## Running under: Ubuntu 20.04.3 LTS
 ## 
 ## Matrix products: default
 ## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
@@ -122,9 +120,12 @@ popupProperty is to set what is displayed when you click on a feature. I have al
 ## [4] leaflet_2.0.4.1     
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] bookdown_0.20     digest_0.6.27     R6_2.4.1          jsonlite_1.6.1   
-##  [5] magrittr_2.0.1    evaluate_0.14     blogdown_0.20     rlang_0.4.9      
-##  [9] stringi_1.4.6     rmarkdown_2.5     tools_3.6.3       stringr_1.4.0    
-## [13] crosstalk_1.1.0.1 xfun_0.19         yaml_2.2.1        compiler_3.6.3   
-## [17] htmltools_0.5.0   knitr_1.30</code></pre>
+##  [1] bookdown_0.20        digest_0.6.28        R6_2.5.1            
+##  [4] jsonlite_1.7.2       magrittr_2.0.1       evaluate_0.14       
+##  [7] blogdown_0.20        stringi_1.7.5        rlang_0.4.11        
+## [10] jquerylib_0.1.4      bslib_0.3.1          rmarkdown_2.11      
+## [13] tools_3.6.3          stringr_1.4.0        crosstalk_1.1.0.1   
+## [16] xfun_0.26            yaml_2.2.1           fastmap_1.1.0       
+## [19] compiler_3.6.3       htmltools_0.5.2.9000 knitr_1.36          
+## [22] sass_0.4.0</code></pre>
 </div>
