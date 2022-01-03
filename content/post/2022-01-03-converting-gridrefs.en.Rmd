@@ -25,7 +25,7 @@ Here I set out how to convert UK grid references into a simple features point da
 
 As ever first, we need to load some libraries, load the data and clean it up a bit.  The data are a download of my iRecord records from 2020 and 2021, mostly recorded during covid lockdowns!  I like to use the {janitor} package to clean up the column names.
 
-```{r clean_data message=FALSE, warning=FALSE}
+```{r clean_data}
 
 library(sf)
 library(rnrfa)
@@ -38,7 +38,7 @@ r <- janitor::clean_names(r)
 
 ```
 
-A UK grid reference uses a two letter reference for the 100km grid square in which it is is, plus 2-10 numbers to describe the remaining eastings and northings (x and y) of the location.  It looks something like this SU1234 5678.  To map this, we need to convert it into eastings and northing, which essentially encode the distance in metres froim teh grid zero point, somewhere out in the Atlantic Ocean.  For the grid reference I used as an example that would be 41234 15678.
+A UK grid reference uses a two letter reference for the 100km grid square in which it is is, plus 2-10 numbers to describe the remaining eastings and northings (x and y) of the location.  It looks something like this SU1234 5678.  To map this, we need to convert it into eastings and northing, which essentially encode the distance in metres from the grid zero point, somewhere out in the Atlantic Ocean.  For the grid reference I used as an example that would be 41234 15678.
 
 The {rnrfa} package provides a handy function to convert grid refs into their eastings and northings, as follows:
 
@@ -54,7 +54,7 @@ r$north <- x$northing
 
 ```
 
-The osg_parse() function creates a list of two vectors, one for eastings and one for northings, which we can then add back to our dataframe.  We could use this directly in QGIS now, as it will recognise those references from a plain text file and create the points for you.  To do this in R I used the [Well Known Text](http://wiki.gis.com/wiki/index.php/Well-known_text) format to describe the points.  Others can explain this better than me, but suffice it to say, it is a way of representing vector data in plain text.  That makes it really useful for converting those eastings adn northings into point data.
+The osg_parse() function creates a list of two vectors, one for eastings and one for northings, which we can then add back to our dataframe.  We could use this directly in QGIS now, as it will recognise those references from a plain text file and create the points for you.  To do this in R I used the [Well Known Text](http://wiki.gis.com/wiki/index.php/Well-known_text) format to describe the points.  Others can explain this better than me, but suffice it to say, it is a way of representing vector data in plain text.  That makes it really useful for converting those eastings and northings into point data.
 We can do this very simply using the paste function:
 
 ```{r wkt}
@@ -63,7 +63,7 @@ r$wkt <- paste0("POINT(", r$east, " ", r$north, ")")
 
 ```
 
-Now we have a wkt representation of out points, we can convert this into a simple features dataset.  The {sf} package has a function to convert data into simpel features and we can use the wkt to create the points, as follows:
+Now we have a wkt representation of out points, we can convert this into a simple features dataset.  The {sf} package has a function to convert data into simple features and we can use the wkt to create the points, as follows:
 
 ```{r simple_features}
 
