@@ -1,0 +1,152 @@
+---
+title: Converting UK grid references to points for mapping
+author: Dan Carpenter
+date: '2022-01-03'
+slug: converting_gridrefs
+categories:
+  - R
+  - maps
+tags:
+  - R
+  - maps
+Description: ''
+Tags: []
+Categories: []
+DisableComments: no
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/leaflet/leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet/leaflet.js"></script>
+<link href="/rmarkdown-libs/leafletfix/leafletfix.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/proj4/proj4.min.js"></script>
+<script src="/rmarkdown-libs/Proj4Leaflet/proj4leaflet.js"></script>
+<link href="/rmarkdown-libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet-binding/leaflet.js"></script>
+
+
+<div id="converting-uk-grid-references-for-mapping" class="section level2">
+<h2>Converting UK grid references for mapping</h2>
+<p>The UK has a grid reference system for its spatial references (among others). This is a standard reference used by Ordnance Survey maps and other products. A beginners guide to grid references is provided by Ordnance survey <a href="https://getoutside.ordnancesurvey.co.uk/guides/beginners-guide-to-grid-references/">here</a>. In the world of biological recording grid references are commonly used as the spatial reference for the WHAT part of the key info makign up a record (WHO, WHAT, WHERE, WHEN). However, most GIS systems and other mapping systems cannot map grid references directly. For QGIS there is the <a href="https://www.fscbiodiversity.uk/fsc-plugin-qgis-v3">FSC plugin</a> for working with grid references. For R, you have to do some of the work yourself.</p>
+<p>Here I set out how to convert UK grid references into a simple features point data set and then map it using the {leaflet} package. You can download the code and the sample dataset from <a href="https://github.com/drdcarpenter/convert_gridrefs">Github</a>.</p>
+</div>
+<div id="loading-and-cleaning-the-sampel-data" class="section level2">
+<h2>Loading and cleaning the sampel data</h2>
+<p>As ever first, we need to load some libraries, load the data and clean it up a bit. The data are a download of my iRecord records from 2020 and 2021, mostly recorded during covid lockdowns! I like to use the {janitor} package to clean up the column names.</p>
+<pre class="r"><code>library(sf)</code></pre>
+<pre><code>## Linking to GEOS 3.9.0, GDAL 3.2.1, PROJ 7.2.1</code></pre>
+<pre class="r"><code>library(rnrfa)
+library(readr)
+library(janitor)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;janitor&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     chisq.test, fisher.test</code></pre>
+<pre class="r"><code>library(leaflet)
+
+r &lt;- read_csv(&quot;data/myrecords.csv&quot;)</code></pre>
+<pre><code>## Warning: Missing column names filled in: &#39;X1&#39; [1], &#39;X13&#39; [13]</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   X1 = col_character(),
+##   ID = col_double(),
+##   Src = col_character(),
+##   Species = col_character(),
+##   `Common name` = col_character(),
+##   `Species group` = col_character(),
+##   Location = col_character(),
+##   `Map ref.` = col_character(),
+##   `Vice county` = col_character(),
+##   Date = col_character(),
+##   Recorder = col_character(),
+##   Determiner = col_character(),
+##   X13 = col_character()
+## )</code></pre>
+<pre class="r"><code>r &lt;- janitor::clean_names(r)</code></pre>
+<p>A UK grid reference uses a two letter reference for the 100km grid square in which it is is, plus 2-10 numbers to describe the remaining eastings and northings (x and y) of the location. It looks something like this SU1234 5678. To map this, we need to convert it into eastings and northing, which essentially encode the distance in metres froim teh grid zero point, somewhere out in the Atlantic Ocean. For the grid reference I used as an example that would be 41234 15678.</p>
+<p>The {rnrfa} package provides a handy function to convert grid refs into their eastings and northings, as follows:</p>
+<pre class="r"><code># convert grid refs to E,N
+
+x &lt;- osg_parse(r$map_ref)
+
+# write to data
+
+r$east &lt;- x$easting
+r$north &lt;- x$northing</code></pre>
+<p>The osg_parse() function creates a list of two vectors, one for eastings and one for northings, which we can then add back to our dataframe. We could use this directly in QGIS now, as it will recognise those references from a plain text file and create the points for you. To do this in R I used the <a href="http://wiki.gis.com/wiki/index.php/Well-known_text">Well Known Text</a> format to describe the points. Others can explain this better than me, but suffice it to say, it is a way of representing vector data in plain text. That makes it really useful for converting those eastings adn northings into point data.
+We can do this very simply using the paste function:</p>
+<pre class="r"><code>r$wkt &lt;- paste0(&quot;POINT(&quot;, r$east, &quot; &quot;, r$north, &quot;)&quot;)</code></pre>
+<p>Now we have a wkt representation of out points, we can convert this into a simple features dataset. The {sf} package has a function to convert data into simpel features and we can use the wkt to create the points, as follows:</p>
+<pre class="r"><code>rs &lt;- st_as_sf(r, wkt=&quot;wkt&quot;)
+
+# check tha thtis has worked!
+class(rs)</code></pre>
+<pre><code>## [1] &quot;sf&quot;          &quot;spec_tbl_df&quot; &quot;tbl_df&quot;      &quot;tbl&quot;         &quot;data.frame&quot;</code></pre>
+<p>So we now have a simple features dataset of points for my records. There is no CRS assigned to this data, and we need to do that so we can transform it for later use. UK grid references are in EPSG:27700:</p>
+<pre class="r"><code>st_crs(rs) &lt;- 27700</code></pre>
+<p>Now we have a dataset, we can map it using the {leaflet} library. We need to transform our data in WGS84 for mapping in leaflet, but once done we can go right ahead an map it.</p>
+<pre class="r"><code># transform data for leaflet
+rs &lt;- st_transform(rs, 4326)
+
+# create leaflet map
+
+m &lt;- leaflet(rs) %&gt;% 
+  addTiles() %&gt;% 
+  addMarkers(popup = paste0(&quot;Species: &quot;, rs$common_name,&quot;&lt;br&gt;&quot;,
+                           &quot;(&quot;, rs$species, &quot;)&quot;))
+m</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[[51.4085845600516,51.4566690655718,51.4749411193168,51.378923361916,51.3788941955098,51.4593143535184,51.4422203676978,51.4440183714732,51.4628191552838,51.4422203676978,51.4663757850324,51.4566690655718,51.4593789553186,51.4610733771412,51.4566690655718,51.4566690655718,51.4575809515024,51.4575809515024,51.4566690655718,51.478695150766,51.4566690655718,51.6061365263337,51.456707664016,51.4584799534828,51.4566690655718,51.4628060566593,51.4628060566593,51.4628060566593,51.4628060566593,51.4628060566593,51.6149989278053,51.3558808651399,51.5352516647625,51.4566690655718,51.5304016653881,51.4593402472154,51.4566690655718,51.4566690655718,51.4566690655718,50.6960009109036,50.6950370550464,51.4574127317131,51.4566690655718,51.5652656827338,51.4584541665647,51.4566690655718,51.4566690655718,51.4566690655718,51.4566690655718,51.4520573246845,51.4566690655718,51.4566690655718,51.4566690655718,51.4440183714732,51.4562568784539,51.4663362721722,51.4593013801815,51.532633917585,51.532633917585,51.532633917585,51.4520573246845,51.4566690655718,51.5316942749017,51.4784906064323,51.4654372790025,51.4654372790025,51.4609949493616,51.4609949493616,51.4636524795789,51.4627534855525,51.4474573851649,51.4474573851649,51.4483431834017,51.4465451919628,51.4404353279676,51.4413213655929,51.4413213655929,51.4413213655929,51.4413213655929,51.4413213655929,51.4413213655929,51.4422203676978,51.4422203676978,51.4403963811535,51.4440313377566,51.4440313377566,51.4422203676978,51.4422203676978,51.4422203676978,51.4403963811535,51.4440313377566,51.4458422912449,51.453021352095,51.453021352095,51.4566690655718,51.4566690655718,51.4566690655718,51.4566690655718,51.4457251106694,51.4503631509554,51.4566690655718,51.4593143535184,51.4593143535184,51.4593143535184,51.4566690655718,51.4593789553186,51.4530730572729,51.4539849421336,51.4548839446928,51.4349893545337,51.4349893545337,51.4368263528967,51.4368263528967,51.4386373222045,51.4521482383834,51.453060157461,51.4546187907775,51.4549990969887,51.4561065657601,51.4583823246571,51.4566690655718,51.4566690655718,51.4566690655718,51.4431063861406,51.4431063861406,51.4562363098971,51.4566690655718,51.4589217256363,51.4591952913294,51.4594813999265,51.4566690655718,51.4566690655718,51.4566690655718,51.4566690655718,51.4566690655718,51.4566690655718,51.4440313377566,51.4440313377566,51.4431193696579,51.4431193696579,51.4404093810719,51.4404093810719,51.4404223633433,51.4413083829063,51.4593143535184,51.4654767905986,51.4663757850324,51.464617147394,51.4512879335879,51.450298393286,51.4548323068313,51.4502645448841,51.4538813872256,51.4566690655718,51.459430318896,51.4594175044903,51.4594175044903,51.4594175044903,51.4594175044903,51.4594175044903,51.4566690655718,51.4561065657601,51.4574140175663,51.4561708297078,51.4512879335879,51.4512879335879,51.4566690655718,51.4566690655718,51.4593143535184,51.4512879335879,51.4566690655718,51.4566690655718,51.456707664016,51.4558214913463,51.4558343041122,51.4558343041122,51.4549608717976,51.4557958128438,51.4566690655718,51.4527791332637,51.4566690655718,51.4566690655718,51.4566690655718,51.4566690655718,51.4566690655718,51.4566690655718],[-2.38670394221373,-0.949284850500136,-0.981982388496968,-0.811688965299076,-0.808815963020688,-0.943466568845554,-0.942422132836152,-0.942380608714504,-0.933309156912463,-0.942422132836152,-0.928907407897479,-0.949284850500136,-0.950662029179901,-0.939107627480751,-0.949284850500136,-0.949284850500136,-0.950703250746003,-0.950703250746003,-0.949284850500136,-0.89981888503314,-0.949284850500136,0.00292995696555181,-0.953601881984009,-0.950682640496686,-0.949284850500136,-0.931869962572308,-0.931869962572308,-0.931869962572308,-0.931869962572308,-0.931869962572308,0.0105423923389157,-1.47146773079554,-0.713905944601024,-0.949284850500136,-1.31375828086096,-0.94634474976496,-0.949284850500136,-0.949284850500136,-0.949284850500136,-3.78255318486378,-3.78676448956329,-0.952002502411485,-0.949284850500136,-0.0262813506320591,-0.947804509672943,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.936438256513477,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.942380608714504,-0.953468258126026,-0.924589498709539,-0.942027479997406,-0.898519328645267,-0.898519328645267,-0.898519328645267,-0.936438256513477,-0.949284850500136,-0.894216975174073,-0.878223833690946,-0.924610627474597,-0.924610627474597,-0.930472790877177,-0.930472790877177,-0.926092098880351,-0.926113196094911,-0.925032973051617,-0.925032973051617,-0.923573130443584,-0.923615399617009,-0.943902148330167,-0.942442893284554,-0.942442893284554,-0.942442893284554,-0.942442893284554,-0.942442893284554,-0.942442893284554,-0.942422132836152,-0.942422132836152,-0.939586664539781,-0.943819217322787,-0.943819217322787,-0.942422132836152,-0.942422132836152,-0.942422132836152,-0.939586664539781,-0.943819217322787,-0.945216411536659,-0.943611814641476,-0.943611814641476,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.93226845488438,-0.947990472070829,-0.949284850500136,-0.943466568845554,-0.943466568845554,-0.943466568845554,-0.949284850500136,-0.950662029179901,-0.949367389574871,-0.950785681070043,-0.950765075089871,-0.938273213848924,-0.938273213848924,-0.942546679405298,-0.942546679405298,-0.943943607393674,-0.946510288564846,-0.947928494235125,-0.941272164217592,-0.963715699173182,-0.956782053878037,-0.949821263569301,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.940962792015788,-0.940962792015788,-0.951165862916541,-0.949284850500136,-0.949808886797403,-0.950234424849883,-0.962174821151003,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.943819217322787,-0.943819217322787,-0.942401371312826,-0.942401371312826,-0.941025158060826,-0.941025158060826,-0.942463652658108,-0.941004370455481,-0.943466568845554,-0.928928451846556,-0.928907407897479,-0.933267244075399,-0.950847492608227,-0.940796435192834,-0.945009269847207,-0.937055546645948,-0.939274313784356,-0.949284850500136,-0.956418416671926,-0.954979318202726,-0.954979318202726,-0.954979318202726,-0.954979318202726,-0.954979318202726,-0.949284850500136,-0.956782053878037,-0.952146405769664,-0.953902012120925,-0.950847492608227,-0.950847492608227,-0.949284850500136,-0.949284850500136,-0.943466568845554,-0.950847492608227,-0.949284850500136,-0.949284850500136,-0.953601881984009,-0.9550614179523,-0.956500403383236,-0.956500403383236,-0.959398814939957,-0.952183450280481,-0.949284850500136,-0.936709323647267,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.949284850500136,-0.949284850500136],null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},["Species: NA<br>(Urophora cardui)","Species: Swift<br>(Apus apus)","Species: Stag Beetle<br>(Lucanus cervus)","Species: Oak Apple<br>(Biorhiza pallida)","Species: Great Crested Grebe<br>(Podiceps cristatus)","Species: European Rabbit<br>(Oryctolagus cuniculus)","Species: Great Crested Grebe<br>(Podiceps cristatus)","Species: Oak Apple<br>(Biorhiza pallida)","Species: Little Egret<br>(Egretta garzetta)","Species: Alder Leaf Beetle<br>(Agelastica alni)","Species: Swift<br>(Apus apus)","Species: House Sparrow<br>(Passer domesticus)","Species: Summer Snowflake<br>(Leucojum aestivum)","Species: Oystercatcher<br>(Haematopus ostralegus)","Species: Holly Blue<br>(Celastrina argiolus)","Species: Orange-tip<br>(Anthocharis cardamines britannica)","Species: Sand Martin<br>(Riparia riparia)","Species: Grey Wagtail<br>(Motacilla cinerea)","Species: Kestrel<br>(Falco tinnunculus)","Species: Mandarin Duck<br>(Aix galericulata)","Species: Robin<br>(Erithacus rubecula)","Species: Great Spotted Woodpecker<br>(Dendrocopos major)","Species: Peregrine<br>(Falco peregrinus)","Species: Kingfisher<br>(Alcedo atthis)","Species: Redwing<br>(Turdus iliacus)","Species: Long-tailed Tit<br>(Aegithalos caudatus)","Species: Moorhen<br>(Gallinula chloropus)","Species: Coot<br>(Fulica atra)","Species: Mallard<br>(Anas platyrhynchos)","Species: Shoveler<br>(Spatula clypeata)","Species: Silk-Button Spangle Gall<br>(Neuroterus numismalis)","Species: Harebell<br>(Campanula rotundifolia)","Species: Red Fox<br>(Vulpes vulpes)","Species: Roe Deer<br>(Capreolus capreolus)","Species: Robin's Pin-Cushion Gall<br>(Diplolepis rosae)","Species: Great Crested Grebe<br>(Podiceps cristatus)","Species: Red Underwing<br>(Catocala nupta)","Species: Goldfinch<br>(Carduelis carduelis)","Species: Silver Y<br>(Autographa gamma)","Species: Red Wood Ant<br>(Formica rufa)","Species: Dor Beetle<br>(Geotrupes stercorarius)","Species: Peregrine<br>(Falco peregrinus)","Species: Jay<br>(Garrulus glandarius)","Species: Jersey Tiger<br>(Euplagia quadripunctaria)","Species: Cinnabar<br>(Tyria jacobaeae)","Species: Common Toad<br>(Bufo bufo)","Species: Brown Hawker<br>(Aeshna grandis)","Species: Long-tailed Tit<br>(Aegithalos caudatus)","Species: Peacock<br>(Aglais io)","Species: Buzzard<br>(Buteo buteo)","Species: Long-tailed Tit<br>(Aegithalos caudatus)","Species: Horse-Chestnut Leaf-miner<br>(Cameraria ohridella)","Species: Box Tree Moth<br>(Cydalima perspectalis)","Species: Great Crested Grebe<br>(Podiceps cristatus)","Species: Swift<br>(Apus apus)","Species: Chinese Muntjac<br>(Muntiacus reevesi)","Species: Red-tailed Bumblebee<br>(Bombus lapidarius)","Species: Lime<br>(Tilia)","Species: NA<br>(Eriophyes exilis)","Species: NA<br>(Eriophyes tiliae)","Species: Zebra Finch<br>(Taeniopygia guttata)","Species: Great Tit<br>(Parus major)","Species: Great Crested Grebe<br>(Podiceps cristatus)","Species: Banded Demoiselle<br>(Calopteryx splendens)","Species: Willow<br>(Salix)","Species: NA<br>(Euura proxima)","Species: Lime<br>(Tilia)","Species: NA<br>(Eriophyes leiosoma)","Species: Field Vole<br>(Microtus agrestis)","Species: Roe Deer<br>(Capreolus capreolus)","Species: Sycamore<br>(Acer pseudoplatanus)","Species: NA<br>(Aceria cephalonea)","Species: Treecreeper<br>(Certhia familiaris)","Species: Great Spotted Woodpecker<br>(Dendrocopos major)","Species: Pedunculate Oak<br>(Quercus robur)","Species: Common Knapweed<br>(Centaurea nigra sens. lat. (=nigra/debauxii))","Species: Common Red Soldier Beetle<br>(Rhagonycha fulva)","Species: Ribwort Plantain<br>(Plantago lanceolata)","Species: Red Clover<br>(Trifolium pratense)","Species: Oxeye Daisy<br>(Leucanthemum vulgare)","Species: Grass Vetchling<br>(Lathyrus nissolia)","Species: Alder<br>(Alnus glutinosa)","Species: Sycamore<br>(Acer pseudoplatanus)","Species: Pedunculate Oak<br>(Quercus robur)","Species: Lime<br>(Tilia)","Species: NA<br>(Eriophyes leiosoma)","Species: NA<br>(Aceria nalepai)","Species: NA<br>(Eriophyes laevis)","Species: NA<br>(Aceria cephalonea)","Species: NA<br>(Macrodiplosis roboris)","Species: NA<br>(Eriophyes tiliae)","Species: NA<br>(Aceria cephalonea)","Species: NA<br>(Eriophyes tiliae)","Species: NA<br>(Eriophyes exilis)","Species: Large Red Damselfly<br>(Pyrrhosoma nymphula)","Species: Goldfinch<br>(Carduelis carduelis)","Species: Banded Demoiselle<br>(Calopteryx splendens)","Species: Swollen-thighed Beetle<br>(Oedemera nobilis)","Species: Swift<br>(Apus apus)","Species: House Sparrow<br>(Passer domesticus)","Species: Rose Beetle<br>(Cetonia aurata)","Species: Swallow<br>(Hirundo rustica)","Species: Blackbird<br>(Turdus merula)","Species: European Rabbit<br>(Oryctolagus cuniculus)","Species: Lesser Yellow Underwing<br>(Noctua comes)","Species: Mandarin Duck<br>(Aix galericulata)","Species: Swift<br>(Apus apus)","Species: House Sparrow<br>(Passer domesticus)","Species: House Sparrow<br>(Passer domesticus)","Species: St Marks Fly<br>(Bibio marci)","Species: Orange-tip<br>(Anthocharis cardamines)","Species: NA<br>(Centaurea nigra sensu stricto)","Species: Cowslip<br>(Primula veris)","Species: Cowslip<br>(Primula veris)","Species: Oxeye Daisy<br>(Leucanthemum vulgare)","Species: Chinese Muntjac<br>(Muntiacus reevesi)","Species: 10-spot Ladybird<br>(Adalia decempunctata)","Species: Grey Wagtail<br>(Motacilla cinerea)","Species: Cowslip<br>(Primula veris)","Species: Sand Martin<br>(Riparia riparia)","Species: Bluebell Rust<br>(Uromyces muscari)","Species: Great Tit<br>(Parus major)","Species: NA<br>(Misumena vatia)","Species: Shoveler<br>(Spatula clypeata)","Species: Dunnock<br>(Prunella modularis)","Species: House Sparrow<br>(Passer domesticus)","Species: Holly Blue<br>(Celastrina argiolus)","Species: Summer Snowflake<br>(Leucojum aestivum)","Species: Summer Snowflake<br>(Leucojum aestivum)","Species: Woodpigeon<br>(Columba palumbus)","Species: Bat<br>(Chiroptera)","Species: Holly Blue<br>(Celastrina argiolus)","Species: Orange-tip<br>(Anthocharis cardamines)","Species: Small White<br>(Pieris rapae)","Species: Dark-edged Bee-fly<br>(Bombylius major)","Species: Peacock<br>(Aglais io)","Species: European Mole<br>(Talpa europaea)","Species: Great Spotted Woodpecker<br>(Dendrocopos major)","Species: Tufted Duck<br>(Aythya fuligula)","Species: Wood Anemone<br>(Anemone nemorosa)","Species: Chiffchaff<br>(Phylloscopus collybita)","Species: Wren<br>(Troglodytes troglodytes)","Species: Fritillary<br>(Fritillaria meleagris)","Species: Cowslip<br>(Primula veris)","Species: Ivy-leaved Speedwell<br>(Veronica hederifolia)","Species: Nuthatch<br>(Sitta europaea)","Species: Chiffchaff<br>(Phylloscopus collybita)","Species: Cuckooflower<br>(Cardamine pratensis)","Species: Great Crested Grebe<br>(Podiceps cristatus)","Species: Bat<br>(Chiroptera)","Species: Bat<br>(Chiroptera)","Species: Mistletoe<br>(Viscum album)","Species: Bat<br>(Chiroptera)","Species: Long-tailed Tit<br>(Aegithalos caudatus)","Species: Woodpigeon<br>(Columba palumbus)","Species: Wren<br>(Troglodytes troglodytes)","Species: Chiffchaff<br>(Phylloscopus collybita)","Species: Long-tailed Tit<br>(Aegithalos caudatus)","Species: Eastern Grey Squirrel<br>(Sciurus carolinensis)","Species: Magpie<br>(Pica pica)","Species: Woodpigeon<br>(Columba palumbus)","Species: Cowslip<br>(Primula veris)","Species: Peregrine<br>(Falco peregrinus)","Species: Grey Wagtail<br>(Motacilla cinerea)","Species: Grey Heron<br>(Ardea cinerea)","Species: Great Crested Grebe<br>(Podiceps cristatus)","Species: Eastern Grey Squirrel<br>(Sciurus carolinensis)","Species: Blackbird<br>(Turdus merula)","Species: Egyptian Goose<br>(Alopochen aegyptiaca)","Species: Pied Wagtail<br>(Motacilla alba yarrellii)","Species: Bat<br>(Chiroptera)","Species: Red Fox<br>(Vulpes vulpes)","Species: Goldfinch<br>(Carduelis carduelis)","Species: Great Crested Grebe<br>(Podiceps cristatus)","Species: Canada Goose<br>(Branta canadensis)","Species: Starling<br>(Sturnus vulgaris)","Species: Mallard<br>(Anas platyrhynchos)","Species: House Sparrow<br>(Passer domesticus)","Species: Robin<br>(Erithacus rubecula)","Species: Cowslip<br>(Primula veris)","Species: Magpie<br>(Pica pica)","Species: Red Admiral<br>(Vanessa atalanta)","Species: Woodpigeon<br>(Columba palumbus)","Species: Blue Tit<br>(Cyanistes caeruleus)","Species: 7-spot Ladybird<br>(Coccinella septempunctata)","Species: Brimstone<br>(Gonepteryx rhamni rhamni)"],null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[50.6950370550464,51.6149989278053],"lng":[-3.78676448956329,0.0105423923389157]}},"evals":[],"jsHooks":[]}</script>
+<p>And there we have it - UK grid references converted into a webmap.</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 3.6.3 (2020-02-29)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 20.04.3 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    
+##  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   
+##  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] leaflet_2.0.4.1 janitor_2.0.1   readr_1.3.1     rnrfa_2.0.4    
+## [5] sf_1.0-4       
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.7           lubridate_1.7.9      lattice_0.20-40     
+##  [4] tidyr_1.1.0          png_0.1-7            class_7.3-15        
+##  [7] zoo_1.8-9            assertthat_0.2.1     digest_0.6.28       
+## [10] utf8_1.2.2           R6_2.5.1             plyr_1.8.6          
+## [13] evaluate_0.14        e1071_1.7-9          httr_1.4.2          
+## [16] ggplot2_3.3.3        blogdown_0.20        pillar_1.6.4        
+## [19] RgoogleMaps_1.4.5.3  rlang_0.4.12         curl_4.3.2          
+## [22] jquerylib_0.1.4      blob_1.2.2           rmarkdown_2.11      
+## [25] rgdal_1.5-27         stringr_1.4.0        htmlwidgets_1.5.1   
+## [28] munsell_0.5.0        proxy_0.4-26         compiler_3.6.3      
+## [31] xfun_0.26            pkgconfig_2.0.3      htmltools_0.5.2.9000
+## [34] tidyselect_1.1.1     tibble_3.1.6         bookdown_0.20       
+## [37] fansi_0.5.0          crayon_1.4.2         dplyr_1.0.7         
+## [40] bitops_1.0-7         grid_3.6.3           jsonlite_1.7.2      
+## [43] gtable_0.3.0         lifecycle_1.0.1      DBI_1.1.1           
+## [46] magrittr_2.0.1       units_0.7-2          scales_1.1.1        
+## [49] KernSmooth_2.23-16   stringi_1.7.5        sp_1.4-2            
+## [52] snakecase_0.11.0     bslib_0.3.1          ellipsis_0.3.2      
+## [55] generics_0.1.1       vctrs_0.3.8          rjson_0.2.20        
+## [58] tools_3.6.3          ggmap_3.0.0          glue_1.5.0          
+## [61] purrr_0.3.4          crosstalk_1.1.0.1    hms_0.5.3           
+## [64] jpeg_0.1-8.1         parallel_3.6.3       fastmap_1.1.0       
+## [67] yaml_2.2.1           colorspace_1.4-1     classInt_0.4-3      
+## [70] knitr_1.36           sass_0.4.0</code></pre>
+</div>
