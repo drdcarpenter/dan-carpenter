@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Website of Dan Carpenter</title>
+    <link>/post/</link>
+    <description>Recent content in Posts on Website of Dan Carpenter</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 03 Jan 2022 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Converting UK grid references to points for mapping</title>
+      <link>/2022/01/03/converting_gridrefs/</link>
+      <pubDate>Mon, 03 Jan 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/2022/01/03/converting_gridrefs/</guid>
+      <description>Converting UK grid references for mapping The UK has a grid reference system for its spatial references (among others).</description>
+    </item>
+    
+    <item>
+      <title>Deploying a Leaflet webmap on DigitalOcean</title>
+      <link>/2021/05/20/webmap/</link>
+      <pubDate>Thu, 20 May 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/2021/05/20/webmap/</guid>
+      <description>Creating and deploying webmaps using DigitalOcean Deploying things can seem quite hard.</description>
+    </item>
+    
+    <item>
+      <title>Palmer Park leisure centre and biodiversity net gain</title>
+      <link>/2021/01/18/palmer-park-bng/</link>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/2021/01/18/palmer-park-bng/</guid>
+      <description>Introduction Palmer Park is in the Park ward of east Reading (UK).</description>
+    </item>
+    
+    <item>
+      <title>Street trees and their benefits</title>
+      <link>/2020/12/31/street-trees/</link>
+      <pubDate>Thu, 31 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/12/31/street-trees/</guid>
+      <description>Exploring the benefits of street trees with a Shiny app We receive an enormous number of benefits from trees.</description>
+    </item>
+    
+    <item>
+      <title>Shiny apps on Digital Ocean</title>
+      <link>/2020/11/09/shiny-apps-on-digital-ocean/</link>
+      <pubDate>Mon, 09 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/11/09/shiny-apps-on-digital-ocean/</guid>
+      <description>DigitalOcean This is a quick post to detail (perhaps a strong word) how I managed to deploy a Shiny app via the new DigitalOcean app platform.</description>
+    </item>
+    
+    <item>
+      <title>Estimating carbon in priority habitats</title>
+      <link>/2020/10/28/carbon-in-habitats/</link>
+      <pubDate>Wed, 28 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/10/28/carbon-in-habitats/</guid>
+      <description>Introduction A few weeks a go a wrote a short article for the Thames Valley Environmental Records Centre (TVERC) on the amount of carbon stored and sequestered by priority habitats in Berkshire and Oxfordshire.</description>
+    </item>
+    
+    <item>
+      <title>Lichens in Sabah - geology and soils data</title>
+      <link>/2020/08/28/sabah-geology-data/</link>
+      <pubDate>Fri, 28 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/08/28/sabah-geology-data/</guid>
+      <description>Introduction Back in 2012, shortly after the London Olympic Games, I led a small team of scientists from the Natural History Museum, London, on a field trip to Sabah, Malaysia.</description>
+    </item>
+    
+    <item>
+      <title>Exploring UAV imagery in R</title>
+      <link>/2020/07/31/uav_imagery/</link>
+      <pubDate>Fri, 31 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/07/31/uav_imagery/</guid>
+      <description>Introduction I am a bit obsessed with drones (UAVs) - for me they offer a world of possibilities for environmental scientists and ecologists.</description>
+    </item>
+    
+    <item>
+      <title>Welcome to my new website!</title>
+      <link>/2020/06/28/new-website/</link>
+      <pubDate>Sun, 28 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/06/28/new-website/</guid>
+      <description>Hello! I have finally got around to setting up my personal website.</description>
+    </item>
+    
+  </channel>
+</rss>

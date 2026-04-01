@@ -19,9 +19,9 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 [params]
 title = "Hello, I'm Dan Carpenter"
 author = "Dan Carpenter"
-description = "Ecologist and environmental data scientist using digital tech to aid decision making."
-profilePicture = "images/dc_temp.jpg"
-keywords = "ecology, R, QGIS"
+description = "Executive Coach for Environmental & Impact Leaders | Associate Director – Digital Innovation | Embedding Strategy, Culture & Transformation"
+profilePicture = "images/profile.jpg"
+keywords = "coaching, ecology, R, QGIS"
 favicon = "favicons/"
 customCss = []
 mainSections = ["post"]
@@ -40,18 +40,18 @@ url = "https://www.linkedin.com/in/dan-carpenter-cenv-057b512a/"
 
 [[params.socialIcons]]
 icon = "fa-github"
-title = "GitHub"
-url = "https://github.com/drdcarpenter/"
-
-[[params.socialIcons]]
-icon = "fa-twitter"
-title = "twitter"
-url = "https://twitter.com/drdcarpenter/"
+title = "Codeberg"
+url = "https://codeberg.org/drdcarpenter/"
 
 [[params.socialIcons]]
 icon = "fa-envelope"
 title = "e-mail"
-url = "mailto:drdcarpenter@googlemail.com"
+url = "mailto:dan@dan-carpenter.co.uk"
+
+[[params.socialIcons]]
+icon = "fa-newspaper"
+title = "newsletter"
+url = "https://buttondown.com/dancarpenter"
 
 ## Menu items
 
@@ -62,19 +62,19 @@ url = "mailto:drdcarpenter@googlemail.com"
   identifier = "home"
   weight = 100
   url = "/"
+  
+  [[menu.main]]
+  name = "Coaching"
+  identifier = "coaching"
+  weight = 200
+  url = "/coaching/"
 
   [[menu.main]]
   name = "Posts"
-  weight = 200
+  weight = 300
   identifier = "posts"
   url = "/post/"
   
-  [[menu.main]]
-  name = "Projects"
-  weight = 300
-  identifier = "projects"
-  url = "/projects/"
-
   [[menu.main]]
   name = "About"
   weight = 400
@@ -86,10 +86,4 @@ url = "mailto:drdcarpenter@googlemail.com"
   weight = 500
   identifier = "cv"
   url = "/cv/"
-  
-  [[menu.main]]
-  name = "Apps"
-  weight = 600
-  identifier = "apps"
-  url = "https://app-dan-carpenter.co.uk"
   

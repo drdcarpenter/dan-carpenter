@@ -4,20 +4,36 @@ aliases:
 - about-dancarpenter
 - contact
 author: Dan Carpenter
-date: "2020-06-28"
-description: Dan Carpenter, ecologist and environmental data scientist
+date: "2026-04-01"
+description: Dan Carpenter, Executive Coach & Digital Innovation Strategist
 title: About
 ---
 
-Dan Carpenter is an ecologist and environmental data scientist.  I am interested in using environmental data to support evidence-based decision making.  I think good data are the foundations of good decisions and much of my work is about turning good data into evidence to support those decisions.
+Dan Carpenter is an executive coach and digital innovation strategist who partners with leaders of purpose-driven organisations to build high-performance cultures, embed innovation, and deliver measurable impact for people, nature and business. With over 20 years’ experience across environmental consulting, public
+sector bodies, NGOs and impact-focused enterprises, Dan brings a rare blend of strategic leadership,
+scientific rigour and practical transformation expertise.
 
-I have a BSc (Hons.) in Wildlife Conservation (University of East London) and a PhD in Soil Science (University of Reading).  I have worked in academic research, local government, NGOs and the private sector.  I am a Chartered Environmentalist (CEnv).  For more on my background, please see my [CV](/cv/).
+A Chartered Environmentalist and currently an Associate Director within a multi-company environment
+group, Dan has led digital transformation programmes, developed innovation strategies, built high-performing technical teams, and guided organisations through complex change. Leadership spans biodiversity strategy, digital product development, open-source technology adoption, data-driven decision-making and organisational capability building.
 
-R is my main tool for environmental data science. I have so far written one package and I am working on a couple of others.  I also use QGIS for a lot of my work.  I am very much a beginner and this website will document both my successes and my failures in creating work that is, I hope, of value to others.  This website will showcase some of the [projects](/projects/) I am working on, as well as being a platform for articles about my work, both professional and otherwise.
+As founder of Digital Ecology and former Chief Ecologist at Map Impact, he advised consultancies, local authorities, NGOs, and environmental enterprises on embedding innovation, improving operational efficiency, and scaling impact. Dan combines systems thinking, behavioural insight and strategic pragmatism to help leaders navigate complexity and unlock sustainable growth.
 
-I currently work for [Ethos Environmental Planning Ltd](https://www.ethosep.co.uk/) where I put into practice the business of using data for decision making.
+Particularly sought after by environmental, sustainability and mission-driven organisations seeking to balance commercial performance with long-term ecological and social outcomes.
 
-I drink a LOT of tea.  I love cricket.
+# Subscribe to my newsletter
 
-
+<form
+  action="https://buttondown.com/api/emails/embed-subscribe/dancarpenter"
+  method="post"
+  class="embeddable-buttondown-form"
+>
+  <label for="bd-email">Enter your email</label>
+  <input type="email" name="email" id="bd-email" />
+  <input type="submit" value="Subscribe" />
+  <p>
+    <a href="https://buttondown.com/refer/dancarpenter" target="_blank">
+      Powered by Buttondown.
+    </a>
+  </p>
+</form>
 

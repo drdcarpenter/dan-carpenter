@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light"><head>
+    <title> Dan Carpenter | Palmer Park leisure centre and biodiversity net gain </title>
+    <meta charset="utf-8"><meta name="generator" content="Hugo 0.73.0" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="description" content="Executive Coach for Environmental &amp; Impact Leaders | Associate Director – Digital Innovation | Embedding Strategy, Culture &amp; Transformation">
+    
+    <link rel="stylesheet" href="/css/style.min.67cd718c0a3c8009c771494d381fb7128246a454bd0518fed97cb65d257db948.css" integrity="sha256-Z81xjAo8gAnHcUlNOB&#43;3EoJGpFS9BRj&#43;2Xy2XSV9uUg=" crossorigin="anonymous" type="text/css">
+    
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    
+    <link rel="shortcut icon" href="/favicons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+    <link rel="canonical" href="/2021/01/18/palmer-park-bng/">
+    
+    
+    <script type="text/javascript" src="/js/anatole-header.min.c275265a259296f3dd50e8236a77fcbcadb1dbb9597d3045c675dcc2c7c58a93.js" integrity="sha256-wnUmWiWSlvPdUOgjanf8vK2x27lZfTBFxnXcwsfFipM=" crossorigin="anonymous"></script>
+</head><body><div class="sidebar animated fadeInDown">
+    <div class="logo-title">
+      <div class="title">
+        <img src="/images/profile.jpg" alt="profile picture">
+        <h3 title=""><a href="/">Hello, I&#39;m Dan Carpenter</a></h3>
+        <div class="description">
+          <p>Executive Coach for Environmental &amp; Impact Leaders | Associate Director – Digital Innovation | Embedding Strategy, Culture &amp; Transformation</p>
+        </div>
+      </div>
+    </div>
+    <ul class="social-links">
+        
+        <li>
+        <a href="https://www.linkedin.com/in/dan-carpenter-cenv-057b512a/" rel="me" aria-label="Linkedin">
+          <i class="fa fa-2x fa-linkedin" aria-hidden="true"></i>
+        </a>          
+        </li>
+
+        
+        <li>
+        <a href="https://codeberg.org/drdcarpenter/" rel="me" aria-label="Codeberg">
+          <i class="fa fa-2x fa-github" aria-hidden="true"></i>
+        </a>          
+        </li>
+
+        
+        <li>
+        <a href="mailto:dan@dan-carpenter.co.uk" rel="me" aria-label="e-mail">
+          <i class="fa fa-2x fa-envelope" aria-hidden="true"></i>
+        </a>          
+        </li>
+
+        
+        <li>
+        <a href="https://buttondown.com/dancarpenter" rel="me" aria-label="newsletter">
+          <i class="fa fa-2x fa-newspaper" aria-hidden="true"></i>
+        </a>          
+        </li>
+
+        
+    </ul>
+    <div class="footer">
+        <div class="by_farbox">&copy; Dan Carpenter 2026 </div>
+      </div>
+    </div>
+</div><div class="main">
+            <div class="page-top animated fadeInDown">
+    <ul class="nav">
+        
+        
+        
+        <li><a  href="/" title="">Home</a></li>
+        
+        
+        <li><a  href="/coaching/" title="">Coaching</a></li>
+        
+        
+        <li><a  href="/post/" title="">Posts</a></li>
+        
+        
+        <li><a  href="/about/" title="">About</a></li>
+        
+        
+        <li><a  href="/cv/" title="">CV</a></li>
+        
+    </ul>
+    <div class="themeswitcher">
+        <a class="theme-switch" title="Switch Theme">
+            <i class="fa fa-adjust fa-fw" aria-hidden="true"></i>
+        </a>
+    </div>
+</div>
+
+            <div class="autopagerize_page_element">
+                <div class="content">
+<div class="post animated fadeInDown">
+    <div class="post-content">
+
+      <div class="post-title">
+        <h3>Palmer Park leisure centre and biodiversity net gain
+        </h3>
+        
+        <div class="info">
+          <i class="fa fa-sun-o"></i><span class="date">Mon, Jan 18, 2021</span>
+          <i class="fa fa-clock-o"></i><span class="reading-time">12-minute read</span>
+        </div>
+        
+        </div>
+
+    
+<link href="/rmarkdown-libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/anchor-sections/anchor-sections.js"></script>
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Palmer Park is in the Park ward of east Reading (UK). It has a leisure centre among its facilities and there is a planning proposal to extend this centre to create a swimming pool. East Reading used to have a swimming pool at Arthur Hill - a Victorian baths which Reading Borough Council sold and is now being turned into housing. The leisure centre extension is the Council’s proposal to provide a new swimming pool in east Reading, as well as other new facilities.</p>
+<p>This post details my assessment of the application and its ability to deliver a biodiversity net gain in accordance with the National Planning Policy Framework. It is also an opportunity to develop some R code to process the biodiversity metric which is key to calculating net gain. I have included my code here should it help others. I intend to do further work on this code to create functions that produce the summary tables in this document and perhaps wrap it all into a package. In the meantime the code is here for anyone to use, as well as being on Github.</p>
+<p>I do this stuff in my day job, so I have a lot of experience in biodiversity net gain - it is in my job title. I also help teach other UK ecologists (and some from elsewhere in Europe) how to use the biodiversity metric for the Chartered Institute of Ecology and Environmental Management. However, what follows is merely my professional opinion and is not definitive.</p>
+<p>The application itself does not include an assessment of biodiversity net gain, despite biodiversity net gain being a requirement of both national and local planning policy, as I set out below. Why this is, I do not know.</p>
+</div>
+<div id="biodiversity-net-gain" class="section level2">
+<h2>Biodiversity net gain</h2>
+<p>First a little bit about biodiversity net gain - what is it? Simply put it is development that leaves biodiversity in a better state than before. For example, in this case, the leisure centre development must leave biodiversity in a better state than it is now, before the development takes place (assuming it is approved of course). What do we mean by biodiversity? Well in this case it is restricted to habitats, which of course ignores all of the other biodiversity in the world; genes, species and ecosystems. But that is how the metric works.</p>
+</div>
+<div id="planning-policy" class="section level2">
+<h2>Planning policy</h2>
+<p>The National Planning Policy Framework (<a href="https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/810197/NPPF_Feb_2019_revised.pdf">NPPF</a>) is the document that guides planning in England. In it there are specific references to biodiversity net gain.</p>
+<p>Paragraph 170 of the NPPF states:</p>
+<blockquote>
+<p>Planning policies and decisions should contribute to and enhance the natural and local environment by:…</p>
+</blockquote>
+<blockquote>
+<ol start="4" style="list-style-type: lower-alpha">
+<li>minimising impacts on and <strong>providing net gains for biodiversity</strong>, including by establishing coherent ecological networks that are more resilient to current and future pressures;…</li>
+</ol>
+</blockquote>
+<p>Paragraph 174 of the NPPF states:</p>
+<blockquote>
+<p>To protect and enhance biodiversity and geodiversity, plans should:…</p>
+</blockquote>
+<blockquote>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>promote the conservation, restoration and enhancement of priority habitats, ecological networks and the protection and recovery of priority species; and identify and pursue opportunities for <strong>securing measurable net gains for biodiversity</strong>.</li>
+</ol>
+</blockquote>
+<p>The NPPF is very clear, development should provide measurable net gains for biodiversity. The metric (more on that in a minute) provides the means to measure net gain.</p>
+<p>Reading Borough Council has a <a href="https://images.reading.gov.uk/2019/12/Local_Plan_Adopted_November_2019.pdf">Local Plan adopted in 2019</a>. This sets out local policy for planning. In it there is policy EN12 which says:</p>
+<blockquote>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>On all sites, development should not result in a net loss of biodiversity and geodiversity, and <strong>should provide a net gain for biodiversity</strong> wherever possible.</li>
+</ol>
+</blockquote>
+<p>So Reading Borough Council’s Local Plan also says that development should provide a net gain in biodiversity. So let’s see if the leisure centre proposals do!</p>
+</div>
+<div id="the-metric" class="section level2">
+<h2>The metric</h2>
+<p>I have mentioned this a few times now, but ‘the metric’ is a spreadsheet based calculator for biodiversity net gain assessments. It was put together by Natural England staff and it is free to download from <a href="http://publications.naturalengland.org.uk/publication/5850908674228224">their website</a>. It is currently undergoing a revision, the new version due out in ‘Spring 20201’.</p>
+<p>Essentially, the metric works by calculating the difference between the habitats on a site before and after a development to see if there is a net gain. It is a little bit more complicated than that, but that is the basics. It does require a good habitats survey and an assessment of the habitats condition. It also really needs those habitats mapping in GIS or a CAD system to that the areas of the habitats can be accurately calculated.</p>
+<p>Here I will run through how I calculated the net change in biodiversity units from the information available on the Reading BC planning portal and some data I created using GIS. It is important to note that the data I am going to run through below is data I have created and may not be an accurate reflection of the exact scheme, but it is the best I can do with the information available. First load the packages and read in the metric data.</p>
+<pre class="r"><code>library(openxlsx)
+library(dplyr)
+library(janitor)
+library(readr)
+library(tibble)
+
+metric &lt;- &quot;Palmer Park Biodiversity Metric 2.0 Calculation Tool Beta Test - December 2019 Update.xlsm&quot;
+
+m &lt;- loadWorkbook(metric)</code></pre>
+</div>
+<div id="baseline-habitats" class="section level2">
+<h2>Baseline habitats</h2>
+<p>The first thing to do is calculate the baseline habitats for the development site. But before I could do that I have to map the red line boundary - or the boundary of the application site. This was provided as a pdf on the planning portal:</p>
+<div class="figure">
+<img src="/post/2021-01-18-palmer-park-bng.en_files/00467504_1.png" alt="" />
+<p class="caption">Map showing red line boundary for application site</p>
+</div>
+<p>I had to convert this into a png file so that I could georeference it in QGIS. There is a handy little library in R for doing this: pdftools. The code below shows how to convert a pdf to a png file. I am trying to get this to run as a script in QGIS, but so far I have not had any luck. The first time I tried, QGIS spent hours installing packages, despite many of them already being installed in R. I need to try again.</p>
+<pre class="r"><code>library(pdftools)
+
+pdf_file &lt;- file.path(&quot;mypdf.pdf&quot;)
+pdf_convert(pdf_file)</code></pre>
+<p>Anyway, once I had the image georeferenced, I was able to trace the red line as a vector layer in QGIS. This was then the starting point to map the habitats on the site. There is an ecology report submitted withe application. I know the firm who did it well and they are a good outfit, so I am confident in their assessments. Their maps was not to scale however, so it was not possible to use that to create the habitats data. Instead I used aerial imagery to split up this red line into the different habitats, using the ecology report as a guide for the habitat types.</p>
+<p>I now had the different habitat parcels mapped and areas for each of them calculated in QGIS. Here is a map showing those habitats.</p>
+<div class="figure">
+<img src="/post/2021-01-18-palmer-park-bng.en_files/existing_habitats_small.png" alt="" />
+<p class="caption">Map of existing habitats on development site</p>
+</div>
+</div>
+<div id="entering-baseline-data-into-the-metric" class="section level2">
+<h2>Entering baseline data into the metric</h2>
+<p>I entered the habitat types and areas into the metric. It automatically applies a ‘distinctiveness’ score - this is a measure of a habitats importance for wildlife. I entered a condition score, following the guidance in the technical document that accompanies the metric. Connectivity scores are a function of distinctiveness - if distinctiveness is ‘Low’ or ‘Medium’ connectivity is ‘Low’. If distinctiveness is ‘High’ or ‘Very High’ then connectivity is ‘Medium’. This rule is set out in the user guide. Strategic significance relates to the importance of a habitat in a particular location. I wrote a little bit about this on <a href="https://www.linkedin.com/pulse/strategic-significance-biodiversity-net-gain-dan-carpenter-cenv/">LinkedIn</a>. Essentially, if the location of the habitat has been identified as important for nature conservation then it is said to be strategically significant. Palmer Park does not fall into this category and therefore strategic significance is ‘Low’. Entering all of these data into the metric gives you a total unit score for the site. This is summarised in the table below.</p>
+<pre class="r"><code>baseline &lt;- function(metric){
+  
+  b &lt;- read.xlsx(metric, sheet = 9, startRow = 4, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %&gt;% 
+    select(3:5, 7, 9, 13, 16) %&gt;% 
+    remove_empty(which = c(&quot;rows&quot;, &quot;cols&quot;)) %&gt;% 
+    row_to_names(row_number = 2, remove_row = TRUE) %&gt;% 
+    rename(Habitat = 1, Area = 2, Connectivity = 5, `Biodiversity units` = 7) %&gt;% 
+    slice(1:4)
+  
+  b$Area &lt;-  as.numeric(as.character(b$Area))
+  b$`Biodiversity units` &lt;- as.numeric(as.character(b$`Biodiversity units`))
+  
+  b &lt;- adorn_totals(b)
+  
+  return(b)
+  
+}
+
+b &lt;- baseline(m)
+
+knitr::kable(b, digits = 2)</code></pre>
+<table>
+<colgroup>
+<col width="35%" />
+<col width="3%" />
+<col width="11%" />
+<col width="8%" />
+<col width="9%" />
+<col width="19%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Habitat</th>
+<th align="right">Area</th>
+<th align="left">Distinctiveness</th>
+<th align="left">Condition</th>
+<th align="left">Connectivity</th>
+<th align="left">Strategic significance</th>
+<th align="right">Biodiversity units</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Urban - Amenity grassland</td>
+<td align="right">0.38</td>
+<td align="left">Low</td>
+<td align="left">Poor</td>
+<td align="left">Low</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.76</td>
+</tr>
+<tr class="even">
+<td align="left">Urban - Introduced shrub</td>
+<td align="right">0.01</td>
+<td align="left">Low</td>
+<td align="left">Poor</td>
+<td align="left">Low</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.02</td>
+</tr>
+<tr class="odd">
+<td align="left">Urban - Developed land; sealed surface</td>
+<td align="right">0.91</td>
+<td align="left">V.Low</td>
+<td align="left">N/A - Other</td>
+<td align="left">N/A</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">Woodland and forest - Other woodland; broadleaved</td>
+<td align="right">0.01</td>
+<td align="left">Medium</td>
+<td align="left">Poor</td>
+<td align="left">Low</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.04</td>
+</tr>
+<tr class="odd">
+<td align="left">Total</td>
+<td align="right">1.31</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="right">0.82</td>
+</tr>
+</tbody>
+</table>
+<p>The baseline habitats generate 0.82 biodiversity units.</p>
+</div>
+<div id="retained-habitats" class="section level2">
+<h2>Retained habitats</h2>
+<p>Now that the baseline is mapped, the habitats proposed by the development need to be mapped to carry out the net gain calculation. For this I used a plan of the development as submitted with the application, from which I had previously digitised the red line boundary (see the map earlier).</p>
+<p>The differences are that some of the amenity grassland is lost to create a larger car park, but some different small areas are created in the new car park. The woodland in the application boundary is also being removed as part of the development proposals. Given the location, I am not sure that all that parking space is necessary - surely we should be encourage to walk, cycle or get the bus to the leisure centre! Anyway, that is editorialising! I was able to map the habitats and calculate the area of each habitat. I assigned future condition appropriately and all of the other parameters remained the same. A map of the proposed habitats is below.</p>
+<div class="figure">
+<img src="/post/2021-01-18-palmer-park-bng.en_files/proposed_habitats_small.png" alt="" />
+<p class="caption">Map of proposed habitats on site</p>
+</div>
+<p>The proposed scheme generates 0.44 biodiversity units, as summarised in the table below. This does not include the area of the land retained by the proposed development.</p>
+<pre class="r"><code># create summary table of proposed units
+# this only does the created habitats, not the retained or enhanced habitats
+
+proposed &lt;- function(metric){
+  
+  p &lt;- read.xlsx(metric, sheet = 10, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %&gt;% 
+    select(1:3, 5, 7, 11, 17) %&gt;% 
+    remove_empty(which = c(&quot;rows&quot;, &quot;cols&quot;)) %&gt;% 
+    row_to_names(row_number = 4, remove_row = TRUE) %&gt;% 
+    rename(Habitat = 1, Area = 2, Connectivity = 5, `Strategic significance` = 6, `Biodiversity units` = 7) %&gt;% 
+    slice(2:3)
+  
+  p$Area &lt;- as.numeric(as.character(p$Area))
+  p$`Biodiversity units` &lt;- as.numeric(as.character(p$`Biodiversity units`))
+  
+  return(p)
+  
+}
+
+p &lt;- proposed(m)
+
+# retained habitats
+
+r &lt;- read.xlsx(m, sheet = 9, startRow = 4, skipEmptyRows = TRUE, skipEmptyCols = TRUE)
+retained &lt;- r %&gt;% 
+  select(3,17,5,7,10,13,20) %&gt;% 
+  slice(2:5) %&gt;% 
+  row_to_names(row_number = 1, remove_row = TRUE) %&gt;% 
+  rename(Habitat = 1, Area = 2, Connectivity = 5, `Biodiversity units` = 7)
+
+retained$Area &lt;- as.numeric(as.character(retained$Area))
+retained$`Biodiversity units` &lt;- as.numeric(as.character(retained$`Biodiversity units`))
+
+# proposed units table
+
+proposed &lt;- bind_rows(retained, p) %&gt;% 
+  slice(-6) %&gt;% 
+  adorn_totals()
+
+
+knitr::kable(proposed, digits = 2, format.args = list(scientific = FALSE))</code></pre>
+<table>
+<colgroup>
+<col width="26%" />
+<col width="3%" />
+<col width="11%" />
+<col width="8%" />
+<col width="18%" />
+<col width="18%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Habitat</th>
+<th align="right">Area</th>
+<th align="left">Distinctiveness</th>
+<th align="left">Condition</th>
+<th align="left">Connectivity</th>
+<th align="left">Strategic significance</th>
+<th align="right">Biodiversity units</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Urban - Amenity grassland</td>
+<td align="right">0.16</td>
+<td align="left">Low</td>
+<td align="left">Poor</td>
+<td align="left">Unconnected habitat</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.32</td>
+</tr>
+<tr class="even">
+<td align="left">Urban - Introduced shrub</td>
+<td align="right">0.01</td>
+<td align="left">Low</td>
+<td align="left">Poor</td>
+<td align="left">Unconnected habitat</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.02</td>
+</tr>
+<tr class="odd">
+<td align="left">Urban - Developed land; sealed surface</td>
+<td align="right">0.91</td>
+<td align="left">V.Low</td>
+<td align="left">N/A - Other</td>
+<td align="left">Assessment not appropriate</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">Urban - Amenity grassland</td>
+<td align="right">0.05</td>
+<td align="left">Low</td>
+<td align="left">Poor</td>
+<td align="left">Low</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.10</td>
+</tr>
+<tr class="odd">
+<td align="left">Urban - Developed land; sealed surface</td>
+<td align="right">0.18</td>
+<td align="left">V.Low</td>
+<td align="left">N/A - Other</td>
+<td align="left">N/A</td>
+<td align="left">Low Strategic Significance</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">Total</td>
+<td align="right">1.31</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="right">0.44</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="net-change-in-biodiversity" class="section level2">
+<h2>Net change in biodiversity</h2>
+<p>As can be seen from the next table, the scheme does not deliver a net gain in biodiversity. There is a net loss of 0.38 units (or -47%). As such the scheme does not accord with the NPPF or Local Plan policy EN12 and should be rejected.</p>
+<pre class="r"><code># results table
+results &lt;- read.xlsx(m, sheet = 6, skipEmptyRows = TRUE, skipEmptyCols = TRUE) %&gt;%
+  row_to_names(row_number = 1, remove_row = TRUE) %&gt;% 
+  clean_names() %&gt;% 
+  rename(`Headline Results` = headline_results,&quot; &quot; = na, Units = na_2) %&gt;% 
+  remove_rownames()
+
+options(knitr.kable.NA = &quot;&quot;)
+
+knitr::kable(results, digits = 2, format.args = list(scientific = FALSE, na.encode = TRUE))</code></pre>
+<table>
+<colgroup>
+<col width="81%" />
+<col width="13%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Headline Results</th>
+<th align="left"></th>
+<th align="right">Units</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">On-site baseline</td>
+<td align="left">Habitat units</td>
+<td align="right">0.82</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">Hedgerow units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">River units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">On-site post-intervention</td>
+<td align="left"></td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">(Including habitat retention, creation, enhancement &amp; succession)</td>
+<td align="left">Habitat units</td>
+<td align="right">0.44</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">Hedgerow units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">River units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">Off-site baseline</td>
+<td align="left">Habitat units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">Hedgerow units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">River units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left">Off-site post-intervention</td>
+<td align="left"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">(Including habitat retention, creation, enhancement &amp; succession)</td>
+<td align="left">Habitat units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">Hedgerow units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">River units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left">Total net unit change</td>
+<td align="left"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">(including all on-site &amp; off-site habitat retention/creation)</td>
+<td align="left">Habitat units</td>
+<td align="right">-0.38</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">Hedgerow units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">River units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left">Total net % change</td>
+<td align="left"></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">(including all on-site &amp; off-site habitat creation + retained habitats)</td>
+<td align="left">Habitat units</td>
+<td align="right">-0.47</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">Hedgerow units</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">River units</td>
+<td align="right">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="delivering-a-net-gain-for-biodiversity" class="section level2">
+<h2>Delivering a net gain for biodiversity</h2>
+<p>It would be possible to deliver a net gain for biodiversity by enhancing an area of grassland within the park. I have looked at how much land would be required and what the enhancement should be. The metric is designed so that any losses are offset on a ‘like-for-like’ basis - in this case grassland has been lost, so grassland should be created or enhanced. An area of amenity grassland in the wider park of ~0.15 hectares could be enhanced and managed as wildflower grassland. This grassland would generate sufficient biodiversity units to offset the impact of the development. There was also a small area of woodland lost - the park is not the best place to create woodland, but another woodland (such as The Coal woodland) could be enhanced through planting and management to offset the woodland impacts. All this would of course need to be agreed to by Reading Borough Council and a commitment to manage these enhancements for 30 years entered into. The developer would need to fund that management, so this should be perfectly possible (although of course the developer is actually the Council!).</p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>In summary, both the National Planning Policy Framework and the Reading Local Plan support the delivery of biodiversity net gain for development. The scheme for the leisure centre cannot demonstrate that it can deliver a biodiversity net gain and so should be refused until it can.</p>
+<p>All of the data and a copy of the metric for this article can be found on <a href="https://github.com/drdcarpenter/palmer_park">Github</a>, so others are able to check what I have done and update or improve it.</p>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>## R version 3.6.3 (2020-02-29)
+## Platform: x86_64-pc-linux-gnu (64-bit)
+## Running under: Ubuntu 20.04.1 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    
+##  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   
+##  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] tibble_3.0.4   readr_1.3.1    janitor_2.0.1  dplyr_1.0.2    openxlsx_4.2.3
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.5       knitr_1.30       magrittr_2.0.1   hms_0.5.3       
+##  [5] tidyselect_1.1.0 R6_2.4.1         rlang_0.4.9      highr_0.8       
+##  [9] stringr_1.4.0    tools_3.6.3      xfun_0.19        htmltools_0.5.0 
+## [13] ellipsis_0.3.1   yaml_2.2.1       digest_0.6.27    lifecycle_0.2.0 
+## [17] crayon_1.3.4     bookdown_0.20    zip_2.1.1        purrr_0.3.4     
+## [21] vctrs_0.3.6      snakecase_0.11.0 glue_1.4.2       evaluate_0.14   
+## [25] rmarkdown_2.5    blogdown_0.20    stringi_1.4.6    compiler_3.6.3  
+## [29] pillar_1.4.7     generics_0.0.2   lubridate_1.7.9  pkgconfig_2.0.3</code></pre>
+</div>
+
+    </div>
+    <div class="post-footer">
+      <div class="info">
+        
+<span class="separator"><a class="category" href="/categories/r/">R</a><a class="category" href="/categories/qgis/">QGIS</a><a class="category" href="/categories/habitats/">habitats</a><a class="category" href="/categories/biodiversity/">biodiversity</a></span>
+
+        
+    <span class="separator"><a class="tag" href="/tags/r/">R</a><a class="tag" href="/tags/qgis/">QGIS</a><a class="tag" href="/tags/habitats/">habitats</a><a class="tag" href="/tags/biodiversity/">biodiversity</a></span>
+
+      </div>
+    </div>
+
+    
+           
+    
+</div>
+
+
+                </div>
+            </div>
+        </div>
+</body>
+
+
+
+<script type="text/javascript" src="/js/jquery.min.86b1e8f819ee2d9099a783e50b49dff24282545fc40773861f9126b921532e4c.js" integrity="sha256-hrHo&#43;BnuLZCZp4PlC0nf8kKCVF/EB3OGH5EmuSFTLkw=" crossorigin="anonymous"></script>
+
+
+
+
+<script type="text/javascript" src="/js/bundle.min.0f9c74cb78f13d1f15f33daff4037c70354f98acfbb97a6f61708966675c3cae.js" integrity="sha256-D5x0y3jxPR8V8z2v9AN8cDVPmKz7uXpvYXCJZmdcPK4=" crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="/js/medium-zoom.min.92f21c856129f84aeb719459b3e6ac621a3032fd7b180a18c04e1d12083f8aba.js" integrity="sha256-kvIchWEp&#43;ErrcZRZs&#43;asYhowMv17GAoYwE4dEgg/iro=" crossorigin="anonymous"></script></html></body>
+
+</html>

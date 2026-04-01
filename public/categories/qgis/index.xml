@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>QGIS on Website of Dan Carpenter</title>
+    <link>/categories/qgis/</link>
+    <description>Recent content in QGIS on Website of Dan Carpenter</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 18 Jan 2021 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/qgis/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Palmer Park leisure centre and biodiversity net gain</title>
+      <link>/2021/01/18/palmer-park-bng/</link>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/2021/01/18/palmer-park-bng/</guid>
+      <description>Introduction Palmer Park is in the Park ward of east Reading (UK).</description>
+    </item>
+    
+  </channel>
+</rss>
