@@ -20,20 +20,7 @@ As founder of Digital Ecology and former Chief Ecologist at Map Impact, he advis
 
 Particularly sought after by environmental, sustainability and mission-driven organisations seeking to balance commercial performance with long-term ecological and social outcomes.
 
-# Subscribe to my newsletter
+**Subscribe to my newsletter:** [https://buttondown.com/dancarpenter](https://buttondown.com/dancarpenter)
 
-<form
-  action="https://buttondown.com/api/emails/embed-subscribe/dancarpenter"
-  method="post"
-  class="embeddable-buttondown-form"
->
-  <label for="bd-email">Enter your email</label>
-  <input type="email" name="email" id="bd-email" />
-  <input type="submit" value="Subscribe" />
-  <p>
-    <a href="https://buttondown.com/refer/dancarpenter" target="_blank">
-      Powered by Buttondown.
-    </a>
-  </p>
-</form>
+
 
