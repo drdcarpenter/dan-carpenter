@@ -10,9 +10,6 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 # Enable Disqus
 #disqusShortname = ""
 
-# Google Analytics
-#googleAnalytics = "UA-123-45"
-
 [permalinks]
     post = "/:year/:month/:day/:slug/"
 
